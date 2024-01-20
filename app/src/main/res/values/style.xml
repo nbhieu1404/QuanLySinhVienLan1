@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">#787379</item>
+        <item name="hintTextColor">#787379</item>
+        <item name="android:textColorHint">#787379</item>
+        <item name="android:textSize">19sp</item>
+        <item name="startIconTint">#787379</item>
+        <item name="endIconTint">#787379</item>
+    </style>
+
+    <style name="MyTextInputEditText">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+</resources>

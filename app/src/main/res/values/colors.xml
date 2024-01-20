@@ -2,5 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="red">#FF0000</color>
     <color name="BLUE_P_S">#3F51B5</color>
+    <color name="statusBar">#07184a</color>
 </resources>
