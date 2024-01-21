@@ -41,7 +41,6 @@
             android:textColor="#FFF"
             android:textSize="35sp"
             app:layout_constraintEnd_toEndOf="@+id/background"
-            app:layout_constraintHorizontal_bias="0.535"
             app:layout_constraintStart_toStartOf="@+id/background"
             app:layout_constraintTop_toTopOf="@+id/background" />
 
