@@ -178,6 +178,9 @@ class SignUpActivity : AppCompatActivity() {
                     this, "Vui lòng kiểm tra email để xác thực",
                     Toast.LENGTH_SHORT
                 ).show()
+                val intent = Intent(this, SignInActivity::class.java)
+                startActivity(intent)
+                finish()
             }
             ?.addOnFailureListener {
                 Toast.makeText(
