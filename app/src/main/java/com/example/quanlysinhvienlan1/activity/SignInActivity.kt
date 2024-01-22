@@ -24,10 +24,13 @@ class SignInActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sign_in)
         // Ánh xạ
         mapping()
+
         // Bấm đăng nhập
         clickSignIn()
         // Bấm chuyển sang màn đăng ký
         intentSignUp()
+        // Bấm chuyển sang màn hình quên mật khẩu
+        intentForgetPassword()
     }
     // Ánh xạ
     private fun mapping() {
@@ -42,6 +45,7 @@ class SignInActivity : AppCompatActivity() {
     private fun clickSignIn() {
         btnSignIn?.setOnClickListener {
             val inputEmail = edtEmail?.text.toString()
+
             val inputPassword = edtPassword?.text.toString()
 
             if (inputEmail.isEmpty()) {
@@ -87,6 +91,14 @@ class SignInActivity : AppCompatActivity() {
     private fun intentSignUp(){
         layoutSignUp?.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    // Intent quên mật khẩu
+    private fun intentForgetPassword(){
+        txtForgetPassword?.setOnClickListener{
+            val intent = Intent(this, ForgetPasswordActivity::class.java)
             startActivity(intent)
         }
     }
