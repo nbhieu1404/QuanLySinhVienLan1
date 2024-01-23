@@ -11,5 +11,6 @@
 
     <style name="MyTextInputEditText">
         <item name="android:textColor">@android:color/black</item>
+        <item name="android:textCursorDrawable">@drawable/custom_cursor</item>
     </style>
 </resources>

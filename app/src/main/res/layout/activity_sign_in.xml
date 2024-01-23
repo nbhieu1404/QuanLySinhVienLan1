@@ -59,6 +59,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/box_Email"
         style="@style/MyTextInputLayout"
+
         android:layout_width="match_parent"
 
         android:layout_height="wrap_content"
@@ -81,7 +82,7 @@
             style="@style/MyTextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text|textEmailAddress" />
+            android:inputType="text|textEmailAddress"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -109,7 +110,7 @@
             style="@style/MyTextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -180,14 +181,12 @@
     <RelativeLayout
         android:id="@+id/layout_ProgressBar"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_centerInParent="true"
-        android:background="@drawable/custom_progressbar"
+        android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintBottom_toBottomOf="@+id/btn_SignIn"
+        app:layout_constraintEnd_toEndOf="@+id/btn_SignIn"
+        app:layout_constraintStart_toStartOf="@+id/btn_SignIn"
+        app:layout_constraintTop_toTopOf="@+id/btn_SignIn">
 
         <ProgressBar
             android:layout_width="wrap_content"
