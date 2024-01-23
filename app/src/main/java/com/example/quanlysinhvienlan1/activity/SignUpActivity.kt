@@ -4,9 +4,11 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -32,19 +34,22 @@ class SignUpActivity : AppCompatActivity() {
     private var txtPolicy: TextView? = null
     private var btnSignUp: Button? = null
     private var txtSignIn: TextView? = null
+    private var layoutProgressBar: RelativeLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
         // Ánh xạ
         mapping()
-        // Bấm nhập email
+        // Bấm sự kiện
+        clickEvent()
+
+    }
+
+    private fun clickEvent() {
         resetErrorBoxEmail()
-        // Bấm Chấp thuận chính sách
         resetErrorTextPolicy()
-        // Bấm đăng ký
         clickSignUp()
-        // Bấm intent đăng nhập
         intentSignIn()
     }
 
@@ -59,6 +64,7 @@ class SignUpActivity : AppCompatActivity() {
         txtAccept = findViewById(R.id.txt_accept)
         btnSignUp = findViewById(R.id.btn_SignUp)
         txtSignIn = findViewById(R.id.txt_Signin)
+        layoutProgressBar = findViewById(R.id.layout_ProgressBar)
     }
 
     // Reset màu editText Email
@@ -102,6 +108,7 @@ class SignUpActivity : AppCompatActivity() {
                 && inputPassword.isNotEmpty () && inputConfirmPassword.isNotEmpty()
                 && (inputPassword == inputConfirmPassword)
                 && inputPolicy) {
+                showProgressBar(true)
                 signUp(inputUsername, inputEmail, inputPassword)
             }
         }
@@ -128,13 +135,6 @@ class SignUpActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Đăng ký thành công, lấy thông tin người dùng
                     val user = auth.currentUser
-
-                    // Lưu thông tin vào Realtime Database hoặc Firestore
-//                    saveUserInfoToDatabase(username, email)
-//                    Toast.makeText(
-//                        this, "Đăng ký thành công",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
                     verifyEmail()
                 } else {
                     handleSignUpError(task.exception)
@@ -146,12 +146,14 @@ class SignUpActivity : AppCompatActivity() {
     private fun handleSignUpError(exception: Exception?) {
         when (exception) {
             is FirebaseAuthUserCollisionException -> {
+                showProgressBar(true)
                 // Địa chỉ email đã được sử dụng
                 edtEmail?.setTextColor(Color.RED)
                 Toast.makeText(
                     this, "Địa chỉ Email đã tồn tại",
                     Toast.LENGTH_SHORT
                 ).show()
+                showProgressBar(false)
             }
             is FirebaseAuthWeakPasswordException -> {
                 // Mật khẩu yếu
@@ -159,6 +161,7 @@ class SignUpActivity : AppCompatActivity() {
                     this, "Mật khẩu tối thiểu gồm 6 kí tự",
                     Toast.LENGTH_SHORT
                 ).show()
+                showProgressBar(false)
             }
             else -> {
                 // Xử lý lỗi mặc định
@@ -166,6 +169,7 @@ class SignUpActivity : AppCompatActivity() {
                     this, "Đăng ký thất bại. Vui lòng thử lại.",
                     Toast.LENGTH_SHORT
                 ).show()
+                showProgressBar(false)
             }
         }
     }
@@ -178,6 +182,7 @@ class SignUpActivity : AppCompatActivity() {
                     this, "Vui lòng kiểm tra email để xác thực",
                     Toast.LENGTH_SHORT
                 ).show()
+                showProgressBar(false)
                 val intent = Intent(this, SignInActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -187,6 +192,7 @@ class SignUpActivity : AppCompatActivity() {
                     this, "Gửi xác thực email thất bại",
                     Toast.LENGTH_SHORT
                 ).show()
+                showProgressBar(false)
             }
     }
 
@@ -196,6 +202,29 @@ class SignUpActivity : AppCompatActivity() {
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
             finish()
+        }
+    }
+
+    // Trạng thái của ProgressBar
+    private fun showProgressBar(show: Boolean) {
+        if (show) {
+            layoutProgressBar?.visibility = View.VISIBLE
+            btnSignUp?.isEnabled = false
+            edtUsername?.isEnabled = false
+            edtEmail?.isEnabled = false
+            edtPassword?.isEnabled = false
+            edtConfirmPassword?.isEnabled = false
+            cbPolicy?.isEnabled = false
+            txtSignIn?.isEnabled = false
+        } else {
+            layoutProgressBar?.visibility = View.GONE
+            btnSignUp?.isEnabled = true
+            edtUsername?.isEnabled = true
+            edtEmail?.isEnabled = true
+            edtPassword?.isEnabled = true
+            edtConfirmPassword?.isEnabled = true
+            cbPolicy?.isEnabled = true
+            txtSignIn?.isEnabled = true
         }
     }
 }

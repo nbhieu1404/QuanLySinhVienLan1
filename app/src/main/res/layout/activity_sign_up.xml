@@ -5,11 +5,10 @@
     android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context=".activity.SignUpActivity">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp">
 
         <View
             android:id="@+id/background"
@@ -249,5 +248,22 @@
                 android:text="Đăng nhập"
                 android:textColor="@color/BLUE_P_S"/>
         </LinearLayout>
+        <RelativeLayout
+            android:id="@+id/layout_ProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/custom_progressbar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:visibility="gone"
+            android:layout_centerInParent="true">
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -4,9 +4,11 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Layout
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.example.quanlysinhvienlan1.R
@@ -18,20 +20,17 @@ class SignInActivity : AppCompatActivity() {
     private var btnSignIn: Button? = null
     private var txtForgetPassword: TextView? = null
     private var layoutSignUp: LinearLayout? = null
+    private var layoutProgressBar: RelativeLayout? = null
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
         // Ánh xạ
         mapping()
-
-        // Bấm đăng nhập
-        clickSignIn()
-        // Bấm chuyển sang màn đăng ký
-        intentSignUp()
-        // Bấm chuyển sang màn hình quên mật khẩu
-        intentForgetPassword()
+        // CLick sự kiện
+        clickEvent()
     }
+
     // Ánh xạ
     private fun mapping() {
         edtEmail = findViewById(R.id.edt_Email)
@@ -39,13 +38,19 @@ class SignInActivity : AppCompatActivity() {
         btnSignIn = findViewById(R.id.btn_SignIn)
         txtForgetPassword = findViewById(R.id.txt_ForgetPassword)
         layoutSignUp = findViewById(R.id.layout_SignUp)
+        layoutProgressBar = findViewById(R.id.layout_ProgressBar)
+    }
+
+    private fun clickEvent() {
+        clickSignIn()
+        intentSignUp()
+        intentForgetPassword()
     }
 
     // Bấm đăng nhập
     private fun clickSignIn() {
         btnSignIn?.setOnClickListener {
             val inputEmail = edtEmail?.text.toString()
-
             val inputPassword = edtPassword?.text.toString()
 
             if (inputEmail.isEmpty()) {
@@ -53,6 +58,7 @@ class SignInActivity : AppCompatActivity() {
             } else if (inputPassword.isEmpty()) {
                 edtPassword?.error = "Vui lòng nhập mật khẩu"
             } else {
+                showProgressBar(true)
                 signInUser(inputEmail, inputPassword)
             }
         }
@@ -71,11 +77,13 @@ class SignInActivity : AppCompatActivity() {
                                 this, "Đăng nhập thành công",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            showProgressBar(false)
                         } else {
                             Toast.makeText(
                                 this, "Email chưa được xác thực",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            showProgressBar(false)
                         }
                     }
                 } else {
@@ -83,12 +91,13 @@ class SignInActivity : AppCompatActivity() {
                         this, "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập",
                         Toast.LENGTH_SHORT
                     ).show()
+                    showProgressBar(false)
                 }
             }
     }
 
     // Intent đăng ký
-    private fun intentSignUp(){
+    private fun intentSignUp() {
         layoutSignUp?.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
@@ -96,10 +105,27 @@ class SignInActivity : AppCompatActivity() {
     }
 
     // Intent quên mật khẩu
-    private fun intentForgetPassword(){
-        txtForgetPassword?.setOnClickListener{
+    private fun intentForgetPassword() {
+        txtForgetPassword?.setOnClickListener {
             val intent = Intent(this, ForgetPasswordActivity::class.java)
             startActivity(intent)
+        }
+    }
+    private fun showProgressBar(show: Boolean) {
+        if (show) {
+            layoutProgressBar?.visibility = View.VISIBLE
+            btnSignIn?.isEnabled = false
+            edtEmail?.isEnabled = false
+            edtPassword?.isEnabled = false
+            txtForgetPassword?.isEnabled = false
+            layoutSignUp?.isEnabled = false
+        } else {
+            layoutProgressBar?.visibility = View.GONE
+            edtEmail?.isEnabled = true
+            edtPassword?.isEnabled = true
+            btnSignIn?.isEnabled = true
+            txtForgetPassword?.isEnabled = true
+            layoutSignUp?.isEnabled = true
         }
     }
 }
