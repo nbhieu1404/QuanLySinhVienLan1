@@ -1,4 +1,4 @@
-package com.example.quanlysinhvienlan1.user
+package com.example.quanlysinhvienlan1.data
 
 class User (
     var id: Int,
