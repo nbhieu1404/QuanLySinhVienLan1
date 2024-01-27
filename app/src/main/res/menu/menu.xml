@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="Trang chủ"
+        android:icon="@drawable/ic_home"
+        android:id="@+id/home">
+
+    </item>
+    <item
+        android:title="Bài tập"
+        android:icon="@drawable/ic_book"
+        android:id="@+id/ex">
+
+    </item>
+    <item
+        android:title="Thông tin"
+        android:icon="@drawable/ic_username"
+        android:id="@+id/profile">
+
+    </item>
+</menu>
