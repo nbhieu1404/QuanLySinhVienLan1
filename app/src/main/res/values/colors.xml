@@ -5,4 +5,5 @@
     <color name="red">#FF0000</color>
     <color name="BLUE_P_S">#3F51B5</color>
     <color name="statusBar">#07184a</color>
+    <color name="gray">#E5E4E9</color>
 </resources>
