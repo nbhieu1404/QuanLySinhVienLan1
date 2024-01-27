@@ -1,5 +1,7 @@
 package com.example.quanlysinhvienlan1.activity
 
+import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,6 +13,8 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import com.example.quanlysinhvienlan1.MainActivity
 import com.example.quanlysinhvienlan1.R
 import com.google.firebase.auth.FirebaseAuth
 
@@ -29,6 +33,7 @@ class SignInActivity : AppCompatActivity() {
         mapping()
         // CLick sự kiện
         clickEvent()
+
     }
 
     // Ánh xạ
@@ -78,6 +83,10 @@ class SignInActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                             showProgressBar(false)
+                            val intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+
                         } else {
                             Toast.makeText(
                                 this, "Email chưa được xác thực",
@@ -111,6 +120,7 @@ class SignInActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+    // Load Progress Bar
     private fun showProgressBar(show: Boolean) {
         if (show) {
             layoutProgressBar?.visibility = View.VISIBLE
@@ -127,5 +137,27 @@ class SignInActivity : AppCompatActivity() {
             txtForgetPassword?.isEnabled = true
             layoutSignUp?.isEnabled = true
         }
+    }
+
+    //Thoát ứng dụng
+    @SuppressLint("MissingSuperCall")
+    override fun onBackPressed() {
+        showExitDialog()
+    }
+
+    private fun showExitDialog() {
+        val builder = AlertDialog.Builder(this)
+
+        builder.setTitle("Thoát ứng dụng")
+            .setMessage("Bạn có chắc chắn muốn thoát khỏi ứng dụng không?")
+            .setPositiveButton("Có") { dialogInterface: DialogInterface, i: Int ->
+                finish()
+            }
+            .setNegativeButton("Không") { dialogInterface: DialogInterface, i: Int ->
+                dialogInterface.dismiss()
+            }
+
+        val dialog = builder.create()
+        dialog.show()
     }
 }
