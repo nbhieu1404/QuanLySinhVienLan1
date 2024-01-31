@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:title="Trang chủ"
+        android:id="@+id/home"
         android:icon="@drawable/ic_home"
-        android:id="@+id/home">
+        android:title="Trang chủ">
 
     </item>
     <item
-        android:title="Bài tập"
+        android:id="@+id/ex"
         android:icon="@drawable/ic_book"
-        android:id="@+id/ex">
+        android:title="Bài tập">
 
     </item>
     <item
-        android:title="Thông tin"
+        android:id="@+id/profile"
         android:icon="@drawable/ic_username"
-        android:id="@+id/profile">
-
-    </item>
+        android:title="Thông tin"></item>
 </menu>
