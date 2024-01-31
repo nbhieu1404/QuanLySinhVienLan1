@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".fragment.PersonalPageFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <RelativeLayout
+            android:id="@+id/actionBar_PersonalPage"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/statusBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:id="@+id/btn_BackToProfileFragment"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/ic_white_back" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/imv_CoverImage"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:scaleType="centerCrop"
+            android:src="@color/gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/actionBar_PersonalPage" />
+
+        <ImageButton
+            android:id="@+id/btn_ChangeCoverImage"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/custom_button_change_image"
+            android:src="@drawable/ic_camera"
+            app:layout_constraintBottom_toBottomOf="@+id/imv_CoverImage"
+            app:layout_constraintEnd_toEndOf="@+id/imv_CoverImage" />
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/img_Avatar"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="150dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img_default_avatar"
+            app:layout_constraintEnd_toEndOf="@+id/imv_CoverImage"
+            app:layout_constraintStart_toStartOf="@+id/imv_CoverImage"
+            app:layout_constraintTop_toTopOf="@+id/imv_CoverImage"
+            app:riv_corner_radius="150dp" />
+        <ImageButton
+            android:id="@+id/btn_ChangeAvatar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/custom_button_change_image"
+            android:src="@drawable/ic_camera"
+            app:layout_constraintBottom_toBottomOf="@+id/img_Avatar"
+            app:layout_constraintEnd_toEndOf="@+id/img_Avatar"/>
+        <TextView
+            android:id="@+id/txt_Username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Tên người dùng"
+            android:textColor="@color/black"
+            android:textSize="25dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/img_Avatar" />
+
+        <View
+            android:id="@+id/linePersonalPage"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/gray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_Username" />
+
+        <TextView
+            android:id="@+id/txt_DetailsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:text="Chi tiết"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/linePersonalPage" />
+
+        <TextView
+            android:id="@+id/txt_EmailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="Email: "
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_DetailsTitle" />
+
+        <TextView
+            android:id="@+id/txt_EmailDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nội dung Email"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/txt_EmailTitle"
+            app:layout_constraintTop_toBottomOf="@id/txt_DetailsTitle" />
+
+        <TextView
+            android:id="@+id/txt_UsernameTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:text="Họ và tên: "
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txt_EmailDetails" />
+
+        <TextView
+            android:id="@+id/txt_UsernameDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Tên người dùng"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/txt_UsernameTitle"
+            app:layout_constraintTop_toBottomOf="@id/txt_EmailDetails" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
