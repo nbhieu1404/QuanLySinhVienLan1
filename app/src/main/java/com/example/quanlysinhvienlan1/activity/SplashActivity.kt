@@ -17,8 +17,14 @@ class SplashActivity : AppCompatActivity() {
         val currentUser = auth.currentUser
         android.os.Handler().postDelayed({
             if(currentUser != null){
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
+                val isEmailVerified = currentUser.isEmailVerified
+                if(isEmailVerified){
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                }else{
+                    startActivity(Intent(this, SignInActivity::class.java))
+                    finish()
+                }
             }else{
                 startActivity(Intent(this, SignInActivity::class.java))
                 finish()
