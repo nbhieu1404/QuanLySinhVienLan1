@@ -2,7 +2,6 @@ package com.example.quanlysinhvienlan1.activity
 
 import android.content.Intent
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -11,8 +10,10 @@ import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.quanlysinhvienlan1.R
+import com.example.quanlysinhvienlan1.data.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
@@ -68,14 +69,14 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     // Reset màu editText Email
-    private fun resetErrorBoxEmail(){
+    private fun resetErrorBoxEmail() {
         edtEmail?.setOnClickListener {
             edtEmail?.setTextColor(Color.BLACK)
         }
     }
 
     // Reset màu textView chính sách
-    private fun resetErrorTextPolicy(){
+    private fun resetErrorTextPolicy() {
         cbPolicy?.setOnClickListener {
             txtPolicy?.setTextColor(ContextCompat.getColor(this, R.color.BLUE_P_S))
             txtAccept?.setTextColor(Color.BLACK)
@@ -83,7 +84,7 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     // Bấm đăng ký
-    private fun clickSignUp(){
+    private fun clickSignUp() {
         btnSignUp?.setOnClickListener {
             var inputUsername = edtUsername?.text.toString().trim()
             var inputEmail = edtEmail?.text.toString().trim()
@@ -105,14 +106,16 @@ class SignUpActivity : AppCompatActivity() {
                 txtPolicy?.setTextColor(Color.RED)
                 txtAccept?.setTextColor(Color.RED)
             } else if (inputUsername.isNotEmpty() && inputEmail.isNotEmpty()
-                && inputPassword.isNotEmpty () && inputConfirmPassword.isNotEmpty()
+                && inputPassword.isNotEmpty() && inputConfirmPassword.isNotEmpty()
                 && (inputPassword == inputConfirmPassword)
-                && inputPolicy) {
+                && inputPolicy
+            ) {
                 showProgressBar(true)
                 signUp(inputUsername, inputEmail, inputPassword)
             }
         }
     }
+
     // Kiểm tra Email đã tồn tại
     private fun checkEmailExists(email: String, callback: (Boolean) -> Unit) {
         auth.fetchSignInMethodsForEmail(email)
@@ -135,7 +138,25 @@ class SignUpActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Đăng ký thành công, lấy thông tin người dùng
                     val user = auth.currentUser
-                    verifyEmail()
+                    // Thêm người dùng vào FireStore
+                    user?.let {
+                        val newUser = User(username, email)
+                        firestore.collection("users")
+                            .document(it.uid)
+                            .set(newUser)
+                            .addOnSuccessListener {
+                                verifyEmail()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(
+                                    this,
+                                    "Lỗi khi thêm người dùng vào Firestore: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                showProgressBar(false)
+                            }
+                    }
+//                    verifyEmail()
                 } else {
                     handleSignUpError(task.exception)
                 }
@@ -155,6 +176,7 @@ class SignUpActivity : AppCompatActivity() {
                 ).show()
                 showProgressBar(false)
             }
+
             is FirebaseAuthWeakPasswordException -> {
                 // Mật khẩu yếu
                 Toast.makeText(
@@ -163,6 +185,7 @@ class SignUpActivity : AppCompatActivity() {
                 ).show()
                 showProgressBar(false)
             }
+
             else -> {
                 // Xử lý lỗi mặc định
                 Toast.makeText(
@@ -175,7 +198,7 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     //Xác thực Email đăng ký
-    private fun verifyEmail(){
+    private fun verifyEmail() {
         auth.currentUser?.sendEmailVerification()
             ?.addOnSuccessListener { _ ->
                 Toast.makeText(
@@ -197,7 +220,7 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     // Intent đăng nhập
-    private fun intentSignIn(){
+    private fun intentSignIn() {
         txtSignIn?.setOnClickListener {
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
