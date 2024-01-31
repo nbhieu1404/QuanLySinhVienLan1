@@ -2,4 +2,5 @@
     <string name="app_name">Quản lý sinh viên</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="request_permissions">Ứng dụng cần quyền truy cập bộ nhớ để thực hiện chức năng này. Vui lòng cấp quyền trong cài đặt.</string>
 </resources>
