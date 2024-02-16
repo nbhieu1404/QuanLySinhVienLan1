@@ -1,6 +1,10 @@
 package com.example.quanlysinhvienlan1.fragment
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,17 +13,42 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.example.quanlysinhvienlan1.MainActivity
 import com.example.quanlysinhvienlan1.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.squareup.picasso.Picasso
+import java.util.UUID
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 
 class PersonalPageFragment : Fragment() {
+    // Lắng nghe kết quả chọn hình ảnh avatar
+    private val pickImageAvatarLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val selectedImageUri = result.data?.data
+                selectedImageUri?.let {
+                    uploadImageAvatar(it)
+                }
+            }
+        }
+
+    // Lắng nghe kết quả chọn hình ảnh bìa
+    private val pickCoverImageLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val selectedImageUri = result.data?.data
+                selectedImageUri?.let {
+                    uploadCoverImage(it)
+                }
+            }
+        }
     private var param1: String? = null
     private var param2: String? = null
     private var btnBackToProfileFragment: View? = null
@@ -32,7 +61,7 @@ class PersonalPageFragment : Fragment() {
     private var btnChangeAvatar: ImageButton? = null
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val fireStore: FirebaseFirestore = FirebaseFirestore.getInstance()
-//    private lateinit var activity: AppCompatActivity
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage.getInstance()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +78,6 @@ class PersonalPageFragment : Fragment() {
 
 
     ): View? {
-
         val view = inflater.inflate(R.layout.fragment_personal_page, container, false)
         mapping(view)
         loadData()
@@ -77,11 +105,73 @@ class PersonalPageFragment : Fragment() {
         btnChangeAvatar?.setOnClickListener {
             val mainActivity = activity as? MainActivity
             if (mainActivity?.checkNeedsPermission() == true) {
-                Toast.makeText(context, "Cấp quyền thành công", Toast.LENGTH_SHORT).show()
+                startImageAvatarSelection()
             } else {
                 mainActivity?.requestNeedsPermission()
             }
         }
+        btnChangeCoverImage?.setOnClickListener {
+            val mainActivity = activity as? MainActivity
+            if (mainActivity?.checkNeedsPermission() == true) {
+                startCoverImageSelection()
+            } else {
+                mainActivity?.requestNeedsPermission()
+            }
+        }
+    }
+
+    // Mở thư viện và chọn ảnh
+    private fun startImageAvatarSelection() {
+        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        pickImageAvatarLauncher.launch(galleryIntent)
+    }
+
+    // Tải hình ảnh lên Storage và cập nhật URL của hình ảnh sang FireStorage
+    private fun uploadImageAvatar(imageUri: Uri) {
+        val userID = auth.currentUser?.uid
+        userID?.let {
+            val storageRef = firebaseStorage.reference
+            val imageRef = storageRef.child("avatars/${UUID.randomUUID()}")
+            // Tải hình ảnh lên Storage
+            val uploadTask = imageRef.putFile(imageUri)
+
+            uploadTask.continueWithTask { task ->
+                if (!task.isSuccessful) {
+                    task.exception?.let {
+                        throw it
+                    }
+                }
+                imageRef.downloadUrl
+            }.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val downloadUri = task.result
+                    updateAvatarUrl(userID, downloadUri.toString())
+                    val imageURL = downloadUri.toString()
+                    // Hiển thị hình ảnh trên ImageView
+                    Picasso.get().load(imageURL).into(imgAvatar)
+                } else {
+                    Toast.makeText(requireContext(), "Cập nhật ảnh đại diện thất bại", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+    }
+
+    // Cập nhật URL của avatar trong firestorage
+    private fun updateAvatarUrl(userID: String, avatarUrl: String) {
+        val userDocRef = fireStore.collection("users").document(userID)
+        userDocRef.update("avatar", avatarUrl)
+            .addOnSuccessListener {
+                Toast.makeText(requireContext(), "Cập nhật ảnh đại diện thành công", Toast.LENGTH_SHORT)
+                    .show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    requireContext(),
+                    "Failed to update avatar: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
     }
 
     // popback fragment
@@ -102,10 +192,14 @@ class PersonalPageFragment : Fragment() {
                         val fireStoreEmail = documentSnapshot.getString("email")
                         txtEmailDetails?.text = fireStoreEmail
                         txtUsernameDetails?.text = fireStoreUsername
-//                        val fireStoreAvatar = documentSnapshot.getString("avatar")
-//                        if(fireStoreAvatar!=null){
-//                            imgAvatar?.loadImage(fireStoreAvatar)
-//                        }
+                        val fireStoreAvatar = documentSnapshot.getString("avatar")
+                        fireStoreAvatar?.let { avatarUrl ->
+                            Picasso.get().load(avatarUrl).into(imgAvatar)
+                        }
+                        val fireStoreCoverImage = documentSnapshot.getString("coverImage")
+                        fireStoreCoverImage?.let { coverImageUrl ->
+                            Picasso.get().load(coverImageUrl).into(imvCoverImage)
+                        }
                     } else {
                         txtUsername?.text = "Loading..."
                     }
@@ -116,11 +210,58 @@ class PersonalPageFragment : Fragment() {
         }
     }
 
+    private fun startCoverImageSelection() {
+        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        pickCoverImageLauncher.launch(galleryIntent)
+    }
 
-//    override fun onAttach(context: Context) {
-//        super.onAttach(context)
-//        activity = context as AppCompatActivity
-//    }
+    private fun uploadCoverImage(imageUri: Uri) {
+        val userID = auth.currentUser?.uid
+        userID?.let {
+            val storageRef = firebaseStorage.reference
+            val imageRef = storageRef.child("coverImages/${UUID.randomUUID()}")
+            // Tải hình ảnh lên Storage
+            val uploadTask = imageRef.putFile(imageUri)
+
+            uploadTask.continueWithTask { task ->
+                if (!task.isSuccessful) {
+                    task.exception?.let {
+                        throw it
+                    }
+                }
+                imageRef.downloadUrl
+            }.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val downloadUri = task.result
+                    updateCoverImageUrl(userID, downloadUri.toString())
+                    val imageURL = downloadUri.toString()
+                    // Hiển thị hình ảnh trên ImageView
+                    Picasso.get().load(imageURL).into(imvCoverImage)
+                } else {
+                    Toast.makeText(requireContext(), "Cập nhật ảnh bìa thất bại", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        }
+    }
+
+    private fun updateCoverImageUrl(userID: String, coverImageUrl: String) {
+        val userDocRef = fireStore.collection("users").document(userID)
+        userDocRef.update("coverImage", coverImageUrl)
+            .addOnSuccessListener {
+                // Handle successful update
+                Toast.makeText(requireContext(), "Cập nhật ảnh bìa thành công", Toast.LENGTH_SHORT)
+                    .show()
+            }
+            .addOnFailureListener { e ->
+                // Handle failed update
+                Toast.makeText(
+                    requireContext(),
+                    "Failed to update cover image: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
 
     companion object {
         /**
