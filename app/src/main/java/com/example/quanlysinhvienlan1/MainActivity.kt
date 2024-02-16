@@ -19,8 +19,12 @@ import com.example.quanlysinhvienlan1.fragment.HomeFragment
 import com.example.quanlysinhvienlan1.fragment.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
+
 val ATLEAST_TIRAMISU = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 val REQUEST_CODE = 999
+val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
 class MainActivity : AppCompatActivity() {
     private val homeFragment = HomeFragment()
     private val exFragment = ExFragment()
@@ -79,6 +83,7 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("Không", null)
             .show()
     }
+
     // Kiểm tra thiết bị đã được cấp quyền hay chưa
     fun checkNeedsPermission(): Boolean {
         val result: Int
@@ -105,6 +110,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
     // Đưa người dùng đến cài đặt tự quyết quyền truy cập
     fun goToSettings(context: Context) {
         // Tạo dialog
@@ -126,21 +132,25 @@ class MainActivity : AppCompatActivity() {
         // Hiển thị dialog
         dialog.show()
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 999) {
+        if (requestCode == REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this,
+                Toast.makeText(
+                    this,
                     "Đã cấp quyền truy cập overide",
-                    Toast.LENGTH_SHORT)
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             } else {
                 goToSettings(this)
             }
         }
     }
+
 }
