@@ -140,7 +140,7 @@ class SignUpActivity : AppCompatActivity() {
                     val user = auth.currentUser
                     // Thêm người dùng vào FireStore
                     user?.let {
-                        val newUser = User(username, email)
+                        val newUser = User(username, email, "", "")
                         firestore.collection("users")
                             .document(it.uid)
                             .set(newUser)
