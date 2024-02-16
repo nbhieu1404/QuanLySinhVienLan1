@@ -49,22 +49,33 @@
             app:layout_constraintBottom_toBottomOf="@+id/imv_CoverImage"
             app:layout_constraintEnd_toEndOf="@+id/imv_CoverImage" />
 
+        <FrameLayout
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_marginTop="-5dp"
+            app:layout_constraintHorizontal_bias="0.5"
+            android:background="@drawable/custom_avatar"
+            app:layout_constraintEnd_toEndOf="@+id/imv_CoverImage"
+            app:layout_constraintStart_toStartOf="@+id/imv_CoverImage"
+            app:layout_constraintTop_toTopOf="@+id/img_Avatar"/>
         <com.makeramen.roundedimageview.RoundedImageView
             android:id="@+id/img_Avatar"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:layout_marginTop="150dp"
+            android:layout_marginTop="140dp"
             android:scaleType="centerCrop"
             android:src="@drawable/img_default_avatar"
             app:layout_constraintEnd_toEndOf="@+id/imv_CoverImage"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/imv_CoverImage"
             app:layout_constraintTop_toTopOf="@+id/imv_CoverImage"
             app:riv_corner_radius="150dp" />
+
         <ImageButton
             android:id="@+id/btn_ChangeAvatar"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:background="@drawable/custom_button_change_image"
             android:src="@drawable/ic_camera"
             app:layout_constraintBottom_toBottomOf="@+id/img_Avatar"
@@ -74,7 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:text="Tên người dùng"
+            android:text=" "
             android:textColor="@color/black"
             android:textSize="25dp"
             android:textStyle="bold"
@@ -119,7 +130,7 @@
             android:id="@+id/txt_EmailDetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nội dung Email"
+            android:text=" "
             android:textColor="@color/black"
             android:textSize="15sp"
             app:layout_constraintStart_toEndOf="@+id/txt_EmailTitle"
@@ -142,7 +153,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Tên người dùng"
+            android:text=" "
             android:textColor="@color/black"
             android:textSize="15sp"
             app:layout_constraintStart_toEndOf="@+id/txt_UsernameTitle"
