@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -18,21 +19,23 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.quanlysinhvienlan1.R
 import com.example.quanlysinhvienlan1.activity.SignInActivity
+import com.example.quanlysinhvienlan1.auth
 import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.squareup.picasso.Picasso
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 class ProfileFragment : Fragment() {
     private var layoutUser: LinearLayout? = null
+    private var viewAvatar: ImageView? = null
     private var txtUsername: TextView? = null
     private var layoutAccountSettings: LinearLayout? = null
     private var layoutChangeUsername: LinearLayout? = null
     private var layoutChangePassword: LinearLayout? = null
     private var btnLogout: Button? = null
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+//    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val fireStore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var isSettingsVisible = true
 
@@ -217,9 +220,9 @@ class ProfileFragment : Fragment() {
             val inputConfirmPassword = edtConfirmPassword.text.toString().trim()
 
             when {
-                inputOldPassword.isNullOrEmpty() -> edtOldPassword.error = "Không được bỏ trống"
-                inputNewPassword.isNullOrEmpty() -> edtNewPassword.error = "Không được để trống"
-                inputConfirmPassword.isNullOrEmpty() -> edtConfirmPassword.error =
+                inputOldPassword.isEmpty() -> edtOldPassword.error = "Không được bỏ trống"
+                inputNewPassword.isEmpty() -> edtNewPassword.error = "Không được để trống"
+                inputConfirmPassword.isEmpty() -> edtConfirmPassword.error =
                     "Không được để trống"
 
                 inputNewPassword.length < 6 -> edtNewPassword.error =
@@ -295,6 +298,10 @@ class ProfileFragment : Fragment() {
                     if(documentSnapshot != null && documentSnapshot.exists()){
                         val fireStoreUsername = documentSnapshot.getString("username")
                         txtUsername?.text = fireStoreUsername
+//                        val fireStoreAvatar = documentSnapshot.getString("avatar")
+//                        fireStoreAvatar?.let { avatarUrl ->
+//                            Picasso.get().load(avatarUrl).into(viewAvatar)
+//                        }
                     }else{
                         txtUsername?.text = "Loading..."
                     }
@@ -309,8 +316,8 @@ class ProfileFragment : Fragment() {
     // Điều hướng sang trang cá nhân
     private fun navigateToPersonalPageFragment(){
         val fragmentPersonalPage = PersonalPageFragment()
-        val framentManager: FragmentManager = requireActivity().supportFragmentManager
-        val transaction: FragmentTransaction = framentManager.beginTransaction()
+        val fragmentManager: FragmentManager = requireActivity().supportFragmentManager
+        val transaction: FragmentTransaction = fragmentManager.beginTransaction()
         transaction.replace(R.id.fragment_Profile, fragmentPersonalPage)
         transaction.addToBackStack(null)
         transaction.commit()
