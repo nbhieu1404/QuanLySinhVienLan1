@@ -2,10 +2,11 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".activity.SignUpActivity">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp">
@@ -15,23 +16,26 @@
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:background="@drawable/wave"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toTopOf="parent">
+
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/background_sign_i_u"
                 android:alpha="0.1"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                android:src="@drawable/background_sign_i_u" />
         </RelativeLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -58,110 +62,114 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/box_Username"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="30dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
-
-            android:hint="Tên người dùng"
             style="@style/MyTextInputLayout"
+            android:layout_width="match_parent"
 
-            app:startIconDrawable="@drawable/ic_username"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="30dp"
+
+            android:layout_marginEnd="30dp"
+            android:hint="Tên người dùng"
+
             app:endIconMode="clear_text"
-
             app:layout_constraintEnd_toEndOf="parent"
+
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/background">
+            app:layout_constraintTop_toBottomOf="@+id/background"
+            app:startIconDrawable="@drawable/ic_username">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_Username"
+                style="@style/MyTextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
-                style="@style/MyTextInputEditText"/>
+                android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/box_Email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
-
-            android:hint="Email"
             style="@style/MyTextInputLayout"
+            android:layout_width="match_parent"
 
-            app:startIconDrawable="@drawable/ic_email"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp"
+
+            android:layout_marginEnd="30dp"
+            android:hint="Email"
+
             app:endIconMode="clear_text"
-
             app:layout_constraintEnd_toEndOf="parent"
+
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/box_Username">
+            app:layout_constraintTop_toBottomOf="@+id/box_Username"
+            app:startIconDrawable="@drawable/ic_email">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_Email"
+                style="@style/MyTextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text|textEmailAddress"
-                style="@style/MyTextInputEditText"/>
+                android:inputType="text|textEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/box_Password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
-
-            android:hint="Mật khẩu"
             style="@style/MyTextInputLayout"
+            android:layout_width="match_parent"
 
-            app:startIconDrawable="@drawable/ic_password"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp"
+
+            android:layout_marginEnd="30dp"
+            android:hint="Mật khẩu"
+
             app:endIconMode="password_toggle"
-
             app:layout_constraintEnd_toEndOf="parent"
+
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/box_Email">
+            app:layout_constraintTop_toBottomOf="@+id/box_Email"
+            app:startIconDrawable="@drawable/ic_password">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_Password"
+                style="@style/MyTextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                style="@style/MyTextInputEditText"/>
+                android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/box_ConfirmPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginEnd="30dp"
-
-            android:hint="Xác nhận mật khẩu"
             style="@style/MyTextInputLayout"
+            android:layout_width="match_parent"
 
-            app:startIconDrawable="@drawable/ic_password"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp"
+
+            android:layout_marginEnd="30dp"
+            android:hint="Xác nhận mật khẩu"
+
             app:endIconMode="password_toggle"
-
             app:layout_constraintEnd_toEndOf="parent"
+
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/box_Password">
+            app:layout_constraintTop_toBottomOf="@+id/box_Password"
+            app:startIconDrawable="@drawable/ic_password">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_ConfirmPassword"
+                style="@style/MyTextInputEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                style="@style/MyTextInputEditText"/>
+                android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <CheckBox
@@ -176,13 +184,13 @@
 
         <TextView
             android:id="@+id/txt_accept"
+            style="@style/MyTextInputEditText"
             android:layout_width="wrap_content"
+
             android:layout_height="wrap_content"
 
             android:layout_marginTop="15dp"
-
             android:text="Tôi chấp thuận với các "
-            style="@style/MyTextInputEditText"
 
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -210,57 +218,60 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
+            android:layout_marginStart="70dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="70dp"
-            android:layout_marginStart="70dp"
-            android:paddingVertical="13dp"
+            android:background="@drawable/custom_button_sign_up"
 
+            android:paddingVertical="13dp"
             android:text="Đăng ký"
             android:textColor="@color/white"
             android:textSize="23sp"
-            android:background="@drawable/custom_button_sign_up"
 
-            app:layout_constraintTop_toBottomOf="@+id/cb_Policy"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/cb_Policy" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:paddingVertical="5dp"
             android:gravity="center"
             android:orientation="horizontal"
+            android:paddingVertical="5dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_SignUp">
+
             <TextView
+                style="@style/MyTextInputEditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Đã có tài khoản? "
-                android:textColor="@color/black"
-                style="@style/MyTextInputEditText"/>
+                android:textColor="@color/black" />
 
             <TextView
                 android:id="@+id/txt_Signin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Đăng nhập"
-                android:textColor="@color/BLUE_P_S"/>
+                android:textColor="@color/BLUE_P_S" />
         </LinearLayout>
+
         <RelativeLayout
             android:id="@+id/layout_ProgressBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@+id/btn_SignUp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/btn_SignUp"
-            app:layout_constraintStart_toStartOf="@+id/btn_SignUp"
             app:layout_constraintEnd_toEndOf="@+id/btn_SignUp"
-            android:visibility="gone">
+            app:layout_constraintStart_toStartOf="@+id/btn_SignUp"
+            app:layout_constraintTop_toTopOf="@+id/btn_SignUp">
+
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"/>
+                android:layout_centerInParent="true" />
         </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
