@@ -3,13 +3,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.HomeFragment"
-    android:background="@color/black">
+    android:background="@color/white"
+    tools:context=".fragment.HomeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <View
+        android:id="@+id/actionBar_HomePage"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="50dp"
+        android:background="@color/statusBar" />
+
+    <EditText
+        android:id="@+id/box_searchHome"
+        style="@style/MyTextInputEditText"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginVertical="5dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="60dp"
+        android:background="@drawable/custom_textbox"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="10dp"
+        android:hint="Tìm kiếm"
+        android:inputType="text"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:textColorHint="#787379"
+        android:textSize="16dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_AddClass"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginVertical="5dp"
+        android:background="@drawable/custom_button_add_class"
+        android:drawableStart="@drawable/ic_add"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_gravity="end"
+        android:layout_marginEnd="10dp"/>
 
 </FrameLayout>
