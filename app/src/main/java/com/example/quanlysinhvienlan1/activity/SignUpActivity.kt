@@ -17,15 +17,15 @@ import com.example.quanlysinhvienlan1.data.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 
 class SignUpActivity : AppCompatActivity() {
     // Tạo FireStore
     // Dialog chính sách
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val firebaseStorage: FirebaseStorage = FirebaseStorage.getInstance()
     private var edtUsername: EditText? = null
     private var edtEmail: EditText? = null
     private var edtPassword: EditText? = null
@@ -138,9 +138,14 @@ class SignUpActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Đăng ký thành công, lấy thông tin người dùng
                     val user = auth.currentUser
+                    val storageRef = firebaseStorage.reference
+                    val defaultImageAvatar =
+                        "https://firebasestorage.googleapis.com/v0/b/quanlysinhvienlan1.appspot.com/o/avatars%2FDefault%20image%20avatar.jpeg?alt=media&token=ab835105-98b2-46ba-8836-5304bc717878"
+                    val defaultCoverImage =
+                        "https://firebasestorage.googleapis.com/v0/b/quanlysinhvienlan1.appspot.com/o/coverImages%2FDefault%20cover%20image.png?alt=media&token=7d4b5a93-247d-485a-ab04-10951e967010"
                     // Thêm người dùng vào FireStore
                     user?.let {
-                        val newUser = User(username, email, "", "")
+                        val newUser = User(username, email, defaultImageAvatar, defaultCoverImage)
                         firestore.collection("users")
                             .document(it.uid)
                             .set(newUser)
@@ -156,7 +161,6 @@ class SignUpActivity : AppCompatActivity() {
                                 showProgressBar(false)
                             }
                     }
-//                    verifyEmail()
                 } else {
                     handleSignUpError(task.exception)
                 }
