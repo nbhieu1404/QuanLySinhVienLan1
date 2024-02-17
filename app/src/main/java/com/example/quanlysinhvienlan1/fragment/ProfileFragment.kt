@@ -1,12 +1,17 @@
 package com.example.quanlysinhvienlan1.fragment
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -72,6 +77,31 @@ class ProfileFragment : Fragment() {
         layoutChangeUsername = view.findViewById(R.id.layout_ChangeUsername)
         layoutChangePassword = view.findViewById(R.id.layout_ChangePassword)
         btnLogout = view.findViewById(R.id.btn_Logout)
+        viewAvatar = view.findViewById(R.id.view_avt)
+    }
+    // Lấy dữ liệu người dùng
+    private fun getUserData(){
+        if(auth.currentUser!=null){
+            val userID = auth.currentUser!!.uid
+            val userDocRef = fireStore.collection("users").document(userID)
+            userDocRef.get()
+                .addOnSuccessListener { documentSnapshot ->
+                    if(documentSnapshot != null && documentSnapshot.exists()){
+                        val fireStoreUsername = documentSnapshot.getString("username")
+                        txtUsername?.text = fireStoreUsername
+                        val fireStoreAvatar = documentSnapshot.getString("avatar")
+                        fireStoreAvatar?.let {
+                            Picasso.get().load(it).into(viewAvatar)
+                        }
+                    }else{
+                        txtUsername?.text = "Loading..."
+                    }
+                }
+                .addOnFailureListener{ exception ->
+                    Log.e("FalseUsernameProfileFragment", "${exception.message}")
+                }
+        }
+
     }
 
     //CLick sự kiện
@@ -146,19 +176,24 @@ class ProfileFragment : Fragment() {
         }
     }
 
-
+    // Đổi tên người dùng
     private fun changeUsername(){
-        val builder = AlertDialog.Builder(requireContext())
-        val inflater = requireActivity().layoutInflater
-        val view: View = inflater.inflate(R.layout.custom_dialog_change_username, null)
-        builder.setView(view)
-        val dialog = builder.create()
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.custom_dialog_change_username)
 
-        var prbChangeUsername = view.findViewById<RelativeLayout>(R.id.prb_ChangeUsername)
-        val edtNewFirstName = view.findViewById<EditText>(R.id.edt_NewFirstName)
-        val edtNewLastName = view.findViewById<EditText>(R.id.edt_NewLastName)
-        val btnConfirmChangeUsername = view.findViewById<Button>(R.id.btn_ConfirmChangeUsername)
-        val btnCancelChangeUsername = view.findViewById<Button>(R.id.btn_CancelChangeUsername)
+        val window = dialog.window ?: return
+        window.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        var prbChangeUsername = dialog.findViewById<RelativeLayout>(R.id.prb_ChangeUsername)
+        val edtNewFirstName = dialog.findViewById<EditText>(R.id.edt_NewFirstName)
+        val edtNewLastName = dialog.findViewById<EditText>(R.id.edt_NewLastName)
+        val btnConfirmChangeUsername = dialog.findViewById<Button>(R.id.btn_ConfirmChangeUsername)
+        val btnCancelChangeUsername = dialog.findViewById<Button>(R.id.btn_CancelChangeUsername)
 
         val userID = auth.currentUser?.uid
 
@@ -200,19 +235,23 @@ class ProfileFragment : Fragment() {
     }
     // Đổi mật khẩu
     private fun changePassword() {
-        val builder = AlertDialog.Builder(requireContext())
-        val inflater = requireActivity().layoutInflater
-        val view: View = inflater.inflate(R.layout.custom_dialog_change_password, null)
-        builder.setView(view)
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.custom_dialog_change_password)
 
-        val dialog = builder.create()
+        val window = dialog.window ?: return
+        window.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        val edtOldPassword = view.findViewById<EditText>(R.id.edt_OldPassword)
-        val edtNewPassword = view.findViewById<EditText>(R.id.edt_NewPassword)
-        val edtConfirmPassword = view.findViewById<EditText>(R.id.edt_ConfirmNewPassword)
-        val btnChangePassword = view.findViewById<Button>(R.id.btn_ConfirmChangePassword)
-        val btnCancelChangePassword = view.findViewById<Button>(R.id.btn_CancelChangePassword)
-        val prbChangePassword = view.findViewById<RelativeLayout>(R.id.prb_ChangePassword)
+        val edtOldPassword = dialog.findViewById<EditText>(R.id.edt_OldPassword)
+        val edtNewPassword = dialog.findViewById<EditText>(R.id.edt_NewPassword)
+        val edtConfirmPassword = dialog.findViewById<EditText>(R.id.edt_ConfirmNewPassword)
+        val btnChangePassword = dialog.findViewById<Button>(R.id.btn_ConfirmChangePassword)
+        val btnCancelChangePassword = dialog.findViewById<Button>(R.id.btn_CancelChangePassword)
+        val prbChangePassword = dialog.findViewById<RelativeLayout>(R.id.prb_ChangePassword)
 
         btnChangePassword.setOnClickListener {
             val inputOldPassword = edtOldPassword.text.toString().trim()
@@ -288,30 +327,7 @@ class ProfileFragment : Fragment() {
         dialog.show()
     }
 
-    // Lấy dữ liệu người dùng
-    private fun getUserData(){
-        if(auth.currentUser!=null){
-            val userID = auth.currentUser!!.uid
-            val userDocRef = fireStore.collection("users").document(userID)
-            userDocRef.get()
-                .addOnSuccessListener { documentSnapshot ->
-                    if(documentSnapshot != null && documentSnapshot.exists()){
-                        val fireStoreUsername = documentSnapshot.getString("username")
-                        txtUsername?.text = fireStoreUsername
-//                        val fireStoreAvatar = documentSnapshot.getString("avatar")
-//                        fireStoreAvatar?.let { avatarUrl ->
-//                            Picasso.get().load(avatarUrl).into(viewAvatar)
-//                        }
-                    }else{
-                        txtUsername?.text = "Loading..."
-                    }
-                }
-                .addOnFailureListener{ exception ->
-                    Log.e("FalseUsernameProfileFragment", "${exception.message}")
-                }
-        }
 
-    }
 
     // Điều hướng sang trang cá nhân
     private fun navigateToPersonalPageFragment(){
