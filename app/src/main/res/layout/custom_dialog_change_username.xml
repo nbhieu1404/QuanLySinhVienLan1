@@ -3,32 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
-    android:paddingVertical="20dp">
+    android:layout_margin="16dp"
+    android:background="@drawable/custom_dialog_add_class"
+    android:paddingBottom="20dp">
 
     <TextView
         android:id="@+id/txt_Title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:text="Đổi thông tin"
-        android:textColor="@color/black"
-        android:textSize="30dp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <View
-        android:id="@+id/line"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="10dp"
-        android:background="@color/gray"
+        android:layout_height="wrap_content"
+
+        android:background="@drawable/custom_head_dialog_add_class"
+        android:gravity="center"
+        android:paddingVertical="12dp"
+        android:text="Đổi tên người dùng"
+        android:textColor="@color/white"
+        android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_Title" />
+        app:layout_constraintTop_toTopOf="parent"/>
+
 
 
     <com.google.android.material.textfield.TextInputLayout
@@ -37,14 +30,14 @@
         android:layout_width="match_parent"
 
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="30dp"
+        android:layout_marginHorizontal="20dp"
 
         android:layout_marginTop="10dp"
         android:hint="Họ"
         app:endIconMode="clear_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/line">
+        app:layout_constraintTop_toBottomOf="@+id/txt_Title">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_NewFirstName"
@@ -60,7 +53,7 @@
         android:layout_width="match_parent"
 
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="30dp"
+        android:layout_marginHorizontal="20dp"
 
         android:layout_marginTop="10dp"
         android:hint="Tên"
@@ -81,8 +74,8 @@
         android:id="@+id/btn_ConfirmChangeUsername"
         android:layout_width="120dp"
         android:layout_height="45dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/custom_button_confirm_change_password"
         android:text="Xác nhận"
         android:textColor="@color/white"
@@ -97,11 +90,11 @@
         android:id="@+id/btn_CancelChangeUsername"
         android:layout_width="120dp"
         android:layout_height="45dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="30dp"
-        android:background="@color/gray"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/custom_button_cancel"
         android:text="Hủy"
-        android:textColor="@color/black"
+        android:textColor="#BFB3B3"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/btn_ConfirmChangeUsername"
