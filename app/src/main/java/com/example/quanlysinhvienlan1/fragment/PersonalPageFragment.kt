@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -59,10 +60,11 @@ class PersonalPageFragment : Fragment() {
     private var txtUsernameDetails: TextView? = null
     private var btnChangeCoverImage: ImageButton? = null
     private var btnChangeAvatar: ImageButton? = null
+    private var AvatarProgressBar: ProgressBar? = null
+    private var CoverImageProgressBar: ProgressBar? = null
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val fireStore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val firebaseStorage: FirebaseStorage = FirebaseStorage.getInstance()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,6 +97,8 @@ class PersonalPageFragment : Fragment() {
         txtUsernameDetails = view.findViewById(R.id.txt_UsernameDetails)
         btnChangeCoverImage = view.findViewById(R.id.btn_ChangeCoverImage)
         btnChangeAvatar = view.findViewById(R.id.btn_ChangeAvatar)
+        AvatarProgressBar = view.findViewById(R.id.layout_AvatarProgressBar)
+        CoverImageProgressBar = view.findViewById(R.id.layout_CoverImageProgressBar)
     }
 
     // Sự kiện click
@@ -128,6 +132,7 @@ class PersonalPageFragment : Fragment() {
 
     // Tải hình ảnh lên Storage và cập nhật URL của hình ảnh sang FireStorage
     private fun uploadImageAvatar(imageUri: Uri) {
+        AvatarProgressBar?.visibility = View.VISIBLE
         val userID = auth.currentUser?.uid
         userID?.let {
             val storageRef = firebaseStorage.reference
@@ -149,9 +154,16 @@ class PersonalPageFragment : Fragment() {
                     val imageURL = downloadUri.toString()
                     // Hiển thị hình ảnh trên ImageView
                     Picasso.get().load(imageURL).into(imgAvatar)
+                    AvatarProgressBar?.visibility = View.GONE
                 } else {
-                    Toast.makeText(requireContext(), "Cập nhật ảnh đại diện thất bại", Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        requireContext(),
+                        "Cập nhật ảnh đại diện thất bại",
+                        Toast.LENGTH_SHORT
+
+                    )
                         .show()
+                    AvatarProgressBar?.visibility = View.GONE
                 }
             }
         }
@@ -162,7 +174,11 @@ class PersonalPageFragment : Fragment() {
         val userDocRef = fireStore.collection("users").document(userID)
         userDocRef.update("avatar", avatarUrl)
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Cập nhật ảnh đại diện thành công", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    requireContext(),
+                    "Cập nhật ảnh đại diện thành công",
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
             .addOnFailureListener { e ->
@@ -188,18 +204,21 @@ class PersonalPageFragment : Fragment() {
                 .addOnSuccessListener { documentSnapshot ->
                     if (documentSnapshot != null && documentSnapshot.exists()) {
                         val fireStoreUsername = documentSnapshot.getString("username")
-                        txtUsername?.text = fireStoreUsername
                         val fireStoreEmail = documentSnapshot.getString("email")
+                        val fireStoreAvatar = documentSnapshot.getString("avatar")
+                        val fireStoreCoverImage = documentSnapshot.getString("coverImage")
+
+                        txtUsername?.text = fireStoreUsername
                         txtEmailDetails?.text = fireStoreEmail
                         txtUsernameDetails?.text = fireStoreUsername
-                        val fireStoreAvatar = documentSnapshot.getString("avatar")
-                        fireStoreAvatar?.let { avatarUrl ->
-                            Picasso.get().load(avatarUrl).into(imgAvatar)
+
+                        fireStoreAvatar?.let {
+                            Picasso.get().load(it).into(imgAvatar)
                         }
-                        val fireStoreCoverImage = documentSnapshot.getString("coverImage")
-                        fireStoreCoverImage?.let { coverImageUrl ->
-                            Picasso.get().load(coverImageUrl).into(imvCoverImage)
+                        fireStoreCoverImage?.let {
+                            Picasso.get().load(it).into(imvCoverImage)
                         }
+
                     } else {
                         txtUsername?.text = "Loading..."
                     }
@@ -210,12 +229,14 @@ class PersonalPageFragment : Fragment() {
         }
     }
 
+
     private fun startCoverImageSelection() {
         val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         pickCoverImageLauncher.launch(galleryIntent)
     }
 
     private fun uploadCoverImage(imageUri: Uri) {
+        CoverImageProgressBar?.visibility = View.VISIBLE
         val userID = auth.currentUser?.uid
         userID?.let {
             val storageRef = firebaseStorage.reference
@@ -237,9 +258,15 @@ class PersonalPageFragment : Fragment() {
                     val imageURL = downloadUri.toString()
                     // Hiển thị hình ảnh trên ImageView
                     Picasso.get().load(imageURL).into(imvCoverImage)
+                    CoverImageProgressBar?.visibility = View.GONE
                 } else {
-                    Toast.makeText(requireContext(), "Cập nhật ảnh bìa thất bại", Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        requireContext(),
+                        "Cập nhật ảnh bìa thất bại",
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
+                    CoverImageProgressBar?.visibility = View.GONE
                 }
             }
         }
