@@ -18,7 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.example.quanlysinhvienlan1.MainActivity
 import com.example.quanlysinhvienlan1.R
-import com.google.firebase.auth.FirebaseAuth
+import com.example.quanlysinhvienlan1.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
@@ -29,6 +29,23 @@ private const val ARG_PARAM2 = "param2"
 
 
 class PersonalPageFragment : Fragment() {
+    private var param1: String? = null
+    private var param2: String? = null
+
+    private lateinit var btnBackToProfileFragment: View
+    private lateinit var imvCoverImage: ImageView
+    private lateinit var imgAvatar: ImageView
+    private lateinit var txtUsername: TextView
+    private lateinit var txtEmailDetails: TextView
+    private lateinit var txtUsernameDetails: TextView
+    private lateinit var btnChangeCoverImage: ImageButton
+    private lateinit var btnChangeAvatar: ImageButton
+    private lateinit var prbAvatar: ProgressBar
+    private lateinit var prbCoverImage: ProgressBar
+
+    private lateinit var fireStore: FirebaseFirestore
+    private lateinit var firebaseStorage: FirebaseStorage
+
     // Lắng nghe kết quả chọn hình ảnh avatar
     private val pickImageAvatarLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -50,21 +67,6 @@ class PersonalPageFragment : Fragment() {
                 }
             }
         }
-    private var param1: String? = null
-    private var param2: String? = null
-    private var btnBackToProfileFragment: View? = null
-    private var imvCoverImage: ImageView? = null
-    private var imgAvatar: ImageView? = null
-    private var txtUsername: TextView? = null
-    private var txtEmailDetails: TextView? = null
-    private var txtUsernameDetails: TextView? = null
-    private var btnChangeCoverImage: ImageButton? = null
-    private var btnChangeAvatar: ImageButton? = null
-    private var avatarProgressBar: ProgressBar? = null
-    private var coverImageProgressBar: ProgressBar? = null
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val fireStore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private val firebaseStorage: FirebaseStorage = FirebaseStorage.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,14 +83,19 @@ class PersonalPageFragment : Fragment() {
 
     ): View? {
         val view = inflater.inflate(R.layout.fragment_personal_page, container, false)
-        mapping(view)
+        fireStore = FirebaseFirestore.getInstance()
+        firebaseStorage = FirebaseStorage.getInstance()
+        // Anh xạ các view
+        mappingViews(view)
+        // Load data trang
         loadData()
+        // Sự kiện click
         clickEvent()
         return view
     }
 
     //Ánh xạ
-    private fun mapping(view: View) {
+    private fun mappingViews(view: View) {
         btnBackToProfileFragment = view.findViewById(R.id.btn_BackToProfileFragment)
         imvCoverImage = view.findViewById(R.id.imv_CoverImage)
         imgAvatar = view.findViewById(R.id.img_Avatar)
@@ -97,8 +104,9 @@ class PersonalPageFragment : Fragment() {
         txtUsernameDetails = view.findViewById(R.id.txt_UsernameDetails)
         btnChangeCoverImage = view.findViewById(R.id.btn_ChangeCoverImage)
         btnChangeAvatar = view.findViewById(R.id.btn_ChangeAvatar)
-        avatarProgressBar = view.findViewById(R.id.layout_AvatarProgressBar)
-        coverImageProgressBar = view.findViewById(R.id.layout_CoverImageProgressBar)
+        prbAvatar = view.findViewById(R.id.layout_AvatarProgressBar)
+        prbCoverImage = view.findViewById(R.id.layout_CoverImageProgressBar)
+
     }
 
     // Load data user
@@ -114,9 +122,9 @@ class PersonalPageFragment : Fragment() {
                         val fireStoreAvatar = documentSnapshot.getString("avatar")
                         val fireStoreCoverImage = documentSnapshot.getString("coverImage")
 
-                        txtUsername?.text = fireStoreUsername
-                        txtEmailDetails?.text = fireStoreEmail
-                        txtUsernameDetails?.text = fireStoreUsername
+                        txtUsername.text = fireStoreUsername
+                        txtEmailDetails.text = fireStoreEmail
+                        txtUsernameDetails.text = fireStoreUsername
 
                         fireStoreAvatar?.let {
                             Picasso.get().load(it).into(imgAvatar)
@@ -124,9 +132,10 @@ class PersonalPageFragment : Fragment() {
                         fireStoreCoverImage?.let {
                             Picasso.get().load(it).into(imvCoverImage)
                         }
-
+                        prbAvatar.visibility = View.GONE
+                        prbCoverImage.visibility = View.GONE
                     } else {
-                        txtUsername?.text = "Loading..."
+                        txtUsername.text = "..."
                     }
                 }
                 .addOnFailureListener { exception ->
@@ -137,10 +146,10 @@ class PersonalPageFragment : Fragment() {
 
     // Sự kiện click
     private fun clickEvent() {
-        btnBackToProfileFragment?.setOnClickListener {
+        btnBackToProfileFragment.setOnClickListener {
             backToProfileFragment()
         }
-        btnChangeAvatar?.setOnClickListener {
+        btnChangeAvatar.setOnClickListener {
             val mainActivity = activity as? MainActivity
             if (mainActivity?.checkNeedsPermission() == true) {
                 startImageAvatarSelection()
@@ -148,7 +157,7 @@ class PersonalPageFragment : Fragment() {
                 mainActivity?.requestNeedsPermission()
             }
         }
-        btnChangeCoverImage?.setOnClickListener {
+        btnChangeCoverImage.setOnClickListener {
             val mainActivity = activity as? MainActivity
             if (mainActivity?.checkNeedsPermission() == true) {
                 startCoverImageSelection()
@@ -166,12 +175,11 @@ class PersonalPageFragment : Fragment() {
 
     // Tải hình ảnh lên Storage và cập nhật URL của hình ảnh sang FireStorage
     private fun uploadImageAvatar(imageUri: Uri) {
-        avatarProgressBar?.visibility = View.VISIBLE
+        prbAvatar.visibility = View.VISIBLE
         val userID = auth.currentUser?.uid
         userID?.let {
             val storageRef = firebaseStorage.reference
             val imageRef = storageRef.child("avatars/${UUID.randomUUID()}")
-            // Tải hình ảnh lên Storage
             val uploadTask = imageRef.putFile(imageUri)
 
             uploadTask.continueWithTask { task ->
@@ -186,18 +194,15 @@ class PersonalPageFragment : Fragment() {
                     val downloadUri = task.result
                     updateAvatarUrl(userID, downloadUri.toString())
                     val imageURL = downloadUri.toString()
-                    // Hiển thị hình ảnh trên ImageView
                     Picasso.get().load(imageURL).into(imgAvatar)
-                    avatarProgressBar?.visibility = View.GONE
+                    prbAvatar.visibility = View.GONE
                 } else {
                     Toast.makeText(
                         requireContext(),
                         "Cập nhật ảnh đại diện thất bại",
                         Toast.LENGTH_SHORT
-
-                    )
-                        .show()
-                    avatarProgressBar?.visibility = View.GONE
+                    ).show()
+                    prbAvatar.visibility = View.GONE
                 }
             }
         }
@@ -212,8 +217,7 @@ class PersonalPageFragment : Fragment() {
                     requireContext(),
                     "Cập nhật ảnh đại diện thành công",
                     Toast.LENGTH_SHORT
-                )
-                    .show()
+                ).show()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(
@@ -230,12 +234,11 @@ class PersonalPageFragment : Fragment() {
     }
 
     private fun uploadCoverImage(imageUri: Uri) {
-        coverImageProgressBar?.visibility = View.VISIBLE
+        prbCoverImage.visibility = View.VISIBLE
         val userID = auth.currentUser?.uid
         userID?.let {
             val storageRef = firebaseStorage.reference
             val imageRef = storageRef.child("coverImages/${UUID.randomUUID()}")
-            // Tải hình ảnh lên Storage
             val uploadTask = imageRef.putFile(imageUri)
 
             uploadTask.continueWithTask { task ->
@@ -250,17 +253,15 @@ class PersonalPageFragment : Fragment() {
                     val downloadUri = task.result
                     updateCoverImageUrl(userID, downloadUri.toString())
                     val imageURL = downloadUri.toString()
-                    // Hiển thị hình ảnh trên ImageView
                     Picasso.get().load(imageURL).into(imvCoverImage)
-                    coverImageProgressBar?.visibility = View.GONE
+                    prbCoverImage.visibility = View.GONE
                 } else {
                     Toast.makeText(
                         requireContext(),
                         "Cập nhật ảnh bìa thất bại",
                         Toast.LENGTH_SHORT
-                    )
-                        .show()
-                    coverImageProgressBar?.visibility = View.GONE
+                    ).show()
+                    prbCoverImage.visibility = View.GONE
                 }
             }
         }
@@ -270,12 +271,13 @@ class PersonalPageFragment : Fragment() {
         val userDocRef = fireStore.collection("users").document(userID)
         userDocRef.update("coverImage", coverImageUrl)
             .addOnSuccessListener {
-                // Handle successful update
-                Toast.makeText(requireContext(), "Cập nhật ảnh bìa thành công", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(
+                    requireContext(),
+                    "Cập nhật ảnh bìa thành công",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             .addOnFailureListener { e ->
-                // Handle failed update
                 Toast.makeText(
                     requireContext(),
                     "Failed to update cover image: ${e.message}",
@@ -290,14 +292,6 @@ class PersonalPageFragment : Fragment() {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment PersonalPageFragment.
-         */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
