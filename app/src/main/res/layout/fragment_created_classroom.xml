@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray"
+    tools:context=".fragment.CreatedClassroomFragment">
+
+    <RelativeLayout
+        android:id="@+id/prb_ReloadDataCreatedClassroom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminateTint="@color/black"/>
+    </RelativeLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/layout_ActionBarCreatedClassroom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:id="@+id/actionBar_HomePage"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/statusBar" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:text="Lớp học đã tạo"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+            <!--            <EditText-->
+            <!--                android:id="@+id/box_searchHome"-->
+            <!--                style="@style/MyTextInputEditText"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="40dp"-->
+            <!--                android:layout_marginVertical="5dp"-->
+            <!--                android:layout_marginStart="50dp"-->
+            <!--                android:layout_marginEnd="60dp"-->
+            <!--                android:background="@drawable/custom_textbox"-->
+            <!--                android:drawableStart="@drawable/ic_search"-->
+            <!--                android:drawablePadding="10dp"-->
+            <!--                android:hint="Tìm kiếm"-->
+            <!--                android:inputType="text"-->
+            <!--                android:paddingStart="15dp"-->
+            <!--                android:paddingEnd="15dp"-->
+            <!--                android:textColorHint="#787379"-->
+            <!--                android:textSize="16dp" />-->
+
+            <!--            <androidx.appcompat.widget.AppCompatButton-->
+            <!--                android:id="@+id/btn_AddClass"-->
+            <!--                android:layout_width="40dp"-->
+            <!--                android:layout_height="40dp"-->
+            <!--                android:layout_marginVertical="5dp"-->
+            <!--                android:background="@drawable/custom_button_add_class"-->
+            <!--                android:drawableStart="@drawable/ic_add"-->
+            <!--                android:paddingStart="8dp"-->
+            <!--                android:paddingEnd="8dp"-->
+            <!--                android:layout_gravity="end"-->
+            <!--                android:layout_marginEnd="10dp"/>-->
+        </FrameLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcv_AllCreatedClass"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_ActionBarCreatedClassroom" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_AddNewClass"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            android:layout_margin="20dp"
+            android:layout_marginVertical="5dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/custom_button_add_class"
+            android:drawableStart="@drawable/ic_add"
+            android:paddingStart="13dp"
+            android:paddingEnd="13dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</FrameLayout>
