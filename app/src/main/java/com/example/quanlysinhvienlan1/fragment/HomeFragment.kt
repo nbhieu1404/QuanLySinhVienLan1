@@ -11,23 +11,30 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlysinhvienlan1.R
+import com.example.quanlysinhvienlan1.adapter.ClassroomAdapter
+import com.example.quanlysinhvienlan1.data.Classroom
+import com.google.firebase.firestore.FirebaseFirestore
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-
 class HomeFragment : Fragment() {
-    // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private var btnAddClass: Button? = null
-    private var prbAddClass: RelativeLayout? = null
+    private lateinit var btnJoinClassroom: Button
+    private lateinit var fireStore: FirebaseFirestore
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var classroomAdapter: ClassroomAdapter
+    private lateinit var imvIconApp: ImageView
+    private lateinit var prbReloadDataHome: RelativeLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -41,75 +48,94 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+        fireStore = FirebaseFirestore.getInstance()
+        // Ánh xạ các view
         mapping(view)
+
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        getClassroomList()
+
+        // Sự kiện click
         clickEvent()
         return view
     }
 
+    // Ánh xạ các view
     private fun mapping(view: View) {
-        btnAddClass = view.findViewById(R.id.btn_AddClass)
-        prbAddClass = view.findViewById(R.id.prb_AddClass)
+        recyclerView = view.findViewById(R.id.rcv_AllClass)
+        btnJoinClassroom = view.findViewById(R.id.btn_JoinClassroom)
+        imvIconApp = view.findViewById(R.id.imv_IconApp)
+        prbReloadDataHome = view.findViewById(R.id.prb_ReloadDataHome)
+
     }
 
-
+    // Xử lý các sự kiện click
     private fun clickEvent() {
-        btnAddClass?.setOnClickListener {
-            addClass()
+        btnJoinClassroom.setOnClickListener {
+            showAddClassDialog()
+        }
+        imvIconApp.setOnClickListener {
+            reloadDataHome()
         }
     }
 
+    // Lấy danh sách các lớp học và cập nhật rcv bằng Adapter
+    private fun getClassroomList() {
+        fireStore.collection("classes").get()
+            .addOnSuccessListener { documents ->
+                val classList = mutableListOf<Classroom>()
+                for (document in documents) {
+                    val idClassroom = document.id
+                    val nameClass = document.getString("nameClass") ?: ""
+                    val membersQuantity = document.getLong("membersQuantity") ?: 0
+                    val teacher = document.getString("teacher") ?: ""
+                    // Tạo đối tượng mới với thông tin lấy từ fireStore
+                    val classroom =
+                        Classroom(idClassroom, nameClass, teacher, membersQuantity.toInt())
+                    classList.add(classroom)
+                }
+                classroomAdapter = ClassroomAdapter(classList)
+                recyclerView.adapter = classroomAdapter
+                classroomAdapter.notifyDataSetChanged()
+                prbReloadDataHome.visibility = View.GONE
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(requireContext(), exception.toString(), Toast.LENGTH_SHORT).show()
+            }
+    }
 
-    private fun addClass() {
+    // Hiển thị dialog thêm mới lớp học
+    private fun showAddClassDialog() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.custom_dialog_add_class)
-
+        dialog.setContentView(R.layout.custom_dialog_join_classroom)
         val window = dialog.window ?: return
         window.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val edtIDClassroom = dialog.findViewById<EditText>(R.id.edt_IDClassroom)
+        val btnJoinClassDialog = dialog.findViewById<Button>(R.id.btn_JoinClassDialog)
+        val btnCancelJoinClassroomDialog = dialog.findViewById<Button>(R.id.btn_CancelJoinClass)
+        val prbJoinClassroom = dialog.findViewById<RelativeLayout>(R.id.prb_JoinClassroom)
 
-        val edtClassName = dialog.findViewById<EditText>(R.id.edt_ClassName)
-        val edtMembersQuantity = dialog.findViewById<EditText>(R.id.edt_MembersQuantity)
-        val btnAddClass = dialog.findViewById<Button>(R.id.btn_AddClass)
-        val btnCancelAddClass = dialog.findViewById<Button>(R.id.btn_CancelAddClass)
-
-        btnAddClass.setOnClickListener {
-            val inputClassName = edtClassName.text.toString()
-            val inputMembersQuantity = edtMembersQuantity.text.toString().toIntOrNull()
-
-            when {
-                inputClassName.isEmpty() ->
-                    edtClassName.error = "Vui lòng nhập tên lớp"
-
-                inputMembersQuantity == null ->
-                    edtMembersQuantity.error = "Vui lòng nhập số lượng sinh viên"
-
-                inputMembersQuantity < 1 ->
-                    edtMembersQuantity.error = "Số lượng sinh viên phải lớn hơn 0"
-
-                inputMembersQuantity > 100 ->
-                    edtMembersQuantity.error = "Số lượng sinh viên tối đa = 100"
-
-                inputClassName.length > 3 && inputMembersQuantity < 100 && inputMembersQuantity > 1 -> {
-                    Toast.makeText(requireContext(), "Thành công", Toast.LENGTH_SHORT).show()
-                }
-            }
+        btnJoinClassDialog.setOnClickListener {
+            val inputIDClassroom = edtIDClassroom.text.toString()
+            Toast.makeText(requireContext(), inputIDClassroom, Toast.LENGTH_SHORT).show()
         }
-        btnCancelAddClass.setOnClickListener {
+        btnCancelJoinClassroomDialog.setOnClickListener {
             dialog.dismiss()
         }
 
         dialog.show()
     }
 
-    private fun generateRandomClassCode(): String {
-        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        return (1..6)
-            .map { chars.random() }
-            .joinToString("")
+    private fun reloadDataHome() {
+        prbReloadDataHome.visibility = View.VISIBLE
+        getClassroomList()
+
     }
 
     companion object {
