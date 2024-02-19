@@ -2,7 +2,6 @@ package com.example.quanlysinhvienlan1
 
 import android.Manifest
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -14,7 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.example.quanlysinhvienlan1.fragment.ExFragment
+import com.example.quanlysinhvienlan1.fragment.CreatedClassroomFragment
 import com.example.quanlysinhvienlan1.fragment.HomeFragment
 import com.example.quanlysinhvienlan1.fragment.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -27,28 +26,32 @@ val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
 class MainActivity : AppCompatActivity() {
     private val homeFragment = HomeFragment()
-    private val exFragment = ExFragment()
     private val profileFragment = ProfileFragment()
-    private var btmNav: BottomNavigationView? = null
-    private var currentFragment: Fragment? = null
+    private val createdClassroomFragment = CreatedClassroomFragment()
+    private lateinit var btmNav: BottomNavigationView
+    private lateinit var currentFragment: Fragment
     private val backStackTag = "current_Fragment"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        mapping()
+        setUpBottomNavigation()
+    }
 
+    private fun mapping() {
         btmNav = findViewById(R.id.btm_nav)
         makeCurrentFragment(homeFragment)
+    }
 
-        btmNav?.setOnItemSelectedListener {
+    private fun setUpBottomNavigation() {
+        btmNav.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.home -> makeCurrentFragment(homeFragment)
-                R.id.ex -> makeCurrentFragment(exFragment)
+                R.id.createdClassroom -> makeCurrentFragment(createdClassroomFragment)
                 R.id.profile -> makeCurrentFragment(profileFragment)
             }
             true
         }
-
-
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -65,7 +68,6 @@ class MainActivity : AppCompatActivity() {
         currentFragment = fragment
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.layout_Wrapper, fragment)
-//            addToBackStack(null)  // Thêm vào ngăn xếp back
             if (currentFragment != homeFragment) {
                 addToBackStack(backStackTag)
             }
@@ -77,60 +79,36 @@ class MainActivity : AppCompatActivity() {
         MaterialAlertDialogBuilder(this)
             .setTitle("Thoát ứng dụng")
             .setMessage("Bạn có chắc chắn muốn thoát không?")
-            .setPositiveButton("Có") { _, _ ->
-                finish()
-            }
+            .setPositiveButton("Có") { _, _ -> finish() }
             .setNegativeButton("Không", null)
             .show()
     }
 
-    // Kiểm tra thiết bị đã được cấp quyền hay chưa
     fun checkNeedsPermission(): Boolean {
-        val result: Int
-        if (!ATLEAST_TIRAMISU) {
-            result = checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else {
-            result = checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES)
-        }
-        return result == PackageManager.PERMISSION_GRANTED
+        val permission =
+            if (ATLEAST_TIRAMISU) Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE
+        return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
     }
 
-    // Yêu cầu quyền truy cập
     fun requestNeedsPermission() {
-        if (!checkNeedsPermission()) {
-            val permission: String
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                permission = Manifest.permission.READ_MEDIA_IMAGES
-            } else {
-                permission = Manifest.permission.READ_EXTERNAL_STORAGE
-            }
-            requestPermissions(
-                arrayOf(permission),
-                REQUEST_CODE
-            )
-        }
+        val permission =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE
+        requestPermissions(arrayOf(permission), REQUEST_CODE)
     }
 
-    // Đưa người dùng đến cài đặt tự quyết quyền truy cập
     fun goToSettings(context: Context) {
-        // Tạo dialog
-        val dialog = AlertDialog.Builder(context)
+        AlertDialog.Builder(context)
             .setTitle("Chưa cấp quyền truy cập bộ nhớ")
             .setMessage(R.string.request_permissions)
-            .setPositiveButton("Ok", DialogInterface.OnClickListener { dialog, _ ->
-                // Mở cài đặt
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                intent.data = Uri.parse("package:${context.packageName}")
+            .setPositiveButton("Ok") { dialog, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                }
                 context.startActivity(intent)
                 dialog.dismiss()
-            })
-            .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, _ ->
-                dialog.dismiss()
-            })
-            .create()
-
-        // Hiển thị dialog
-        dialog.show()
+            }
+            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+            .create().show()
     }
 
     override fun onRequestPermissionsResult(
@@ -140,13 +118,8 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(
-                    this,
-                    "Đã cấp quyền truy cập overide",
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
+            if (grantResults.getOrNull(0) == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Đã cấp quyền truy cập", Toast.LENGTH_SHORT).show()
             } else {
                 goToSettings(this)
             }
