@@ -21,41 +21,35 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
 class SignUpActivity : AppCompatActivity() {
-    // Tạo FireStore
-    // Dialog chính sách
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private val firebaseStorage: FirebaseStorage = FirebaseStorage.getInstance()
-    private var edtUsername: EditText? = null
-    private var edtEmail: EditText? = null
-    private var edtPassword: EditText? = null
-    private var edtConfirmPassword: EditText? = null
-    private var cbPolicy: CheckBox? = null
-    private var txtAccept: TextView? = null
-    private var txtPolicy: TextView? = null
-    private var btnSignUp: Button? = null
-    private var txtSignIn: TextView? = null
-    private var layoutProgressBar: RelativeLayout? = null
+    private lateinit var auth: FirebaseAuth
+    private lateinit var fireStore: FirebaseFirestore
+    private lateinit var firebaseStorage: FirebaseStorage
+    private lateinit var edtUsername: EditText
+    private lateinit var edtEmail: EditText
+    private lateinit var edtPassword: EditText
+    private lateinit var edtConfirmPassword: EditText
+    private lateinit var cbPolicy: CheckBox
+    private lateinit var txtAccept: TextView
+    private lateinit var txtPolicy: TextView
+    private lateinit var btnSignUp: Button
+    private lateinit var txtSignIn: TextView
+    private lateinit var prbSignUp: RelativeLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
+        auth = FirebaseAuth.getInstance()
+        fireStore = FirebaseFirestore.getInstance()
+        firebaseStorage = FirebaseStorage.getInstance()
         // Ánh xạ
-        mapping()
+        mappingViews()
         // Bấm sự kiện
         clickEvent()
 
     }
 
-    private fun clickEvent() {
-        resetErrorBoxEmail()
-        resetErrorTextPolicy()
-        clickSignUp()
-        intentSignIn()
-    }
-
     // Ánh xạ
-    private fun mapping() {
+    private fun mappingViews() {
         edtUsername = findViewById(R.id.edt_Username)
         edtEmail = findViewById(R.id.edt_Email)
         edtPassword = findViewById(R.id.edt_Password)
@@ -65,70 +59,78 @@ class SignUpActivity : AppCompatActivity() {
         txtAccept = findViewById(R.id.txt_accept)
         btnSignUp = findViewById(R.id.btn_SignUp)
         txtSignIn = findViewById(R.id.txt_Signin)
-        layoutProgressBar = findViewById(R.id.layout_ProgressBar)
+        prbSignUp = findViewById(R.id.layout_ProgressBar)
     }
+
+    private fun clickEvent() {
+        edtEmail.setOnClickListener {
+            resetErrorBoxEmail()
+        }
+        cbPolicy.setOnClickListener {
+            resetErrorTextPolicy()
+        }
+        txtSignIn.setOnClickListener {
+            intentSignIn()
+        }
+
+        btnSignUp.setOnClickListener {
+            signUpUser()
+        }
+    }
+
 
     // Reset màu editText Email
     private fun resetErrorBoxEmail() {
-        edtEmail?.setOnClickListener {
-            edtEmail?.setTextColor(Color.BLACK)
-        }
+        edtEmail.setTextColor(Color.BLACK)
     }
 
     // Reset màu textView chính sách
     private fun resetErrorTextPolicy() {
-        cbPolicy?.setOnClickListener {
-            txtPolicy?.setTextColor(ContextCompat.getColor(this, R.color.BLUE_P_S))
-            txtAccept?.setTextColor(Color.BLACK)
-        }
+        txtPolicy.setTextColor(ContextCompat.getColor(this, R.color.BLUE_P_S))
+        txtAccept.setTextColor(Color.BLACK)
+
+    }
+
+    // Intent đăng nhập
+    private fun intentSignIn() {
+        val intent = Intent(this, SignInActivity::class.java)
+        startActivity(intent)
+        finish()
+
     }
 
     // Bấm đăng ký
-    private fun clickSignUp() {
-        btnSignUp?.setOnClickListener {
-            var inputUsername = edtUsername?.text.toString().trim()
-            var inputEmail = edtEmail?.text.toString().trim()
-            var inputPassword = edtPassword?.text.toString().trim()
-            var inputConfirmPassword = edtConfirmPassword?.text.toString().trim()
-            var inputPolicy = cbPolicy?.isChecked
+    private fun signUpUser() {
+        val inputUsername = edtUsername.text.toString().trim()
+        val inputEmail = edtEmail.text.toString().trim()
+        val inputPassword = edtPassword.text.toString().trim()
+        val inputConfirmPassword = edtConfirmPassword.text.toString().trim()
+        val inputPolicy = cbPolicy.isChecked
 
-            if (inputUsername.isNullOrEmpty()) {
-                edtUsername?.error = "Vui lòng nhập tên người dùng"
-            } else if (inputEmail.isNullOrEmpty()) {
-                edtEmail?.error = "Vui lòng nhập email"
-            } else if (inputPassword.isNullOrEmpty()) {
-                edtPassword?.error = "Vui lòng nhập mật khẩu"
-            } else if (inputConfirmPassword.isNullOrEmpty()) {
-                edtConfirmPassword?.error = "Vui lòng nhập lại mật khẩu"
-            } else if (inputPassword != inputConfirmPassword) {
-                edtConfirmPassword?.error = "Mật khẩu không trùng khớp"
-            } else if (inputPolicy != true) {
-                txtPolicy?.setTextColor(Color.RED)
-                txtAccept?.setTextColor(Color.RED)
-            } else if (inputUsername.isNotEmpty() && inputEmail.isNotEmpty()
-                && inputPassword.isNotEmpty() && inputConfirmPassword.isNotEmpty()
-                && (inputPassword == inputConfirmPassword)
-                && inputPolicy
-            ) {
+        when {
+            inputUsername.isNullOrEmpty() -> edtUsername.error = "Vui lòng nhập tên người dùng"
+            inputEmail.isNullOrEmpty() -> edtEmail.error = "Vui lòng nhập email"
+            inputPassword.isNullOrEmpty() -> edtPassword.error = "Vui lòng nhập mật khẩu"
+            inputConfirmPassword.isNullOrEmpty() -> edtConfirmPassword.error =
+                "Vui lòng nhập lại mật khẩu"
+
+            inputPassword != inputConfirmPassword -> edtConfirmPassword.error =
+                "Mật khẩu không trùng khớp"
+
+            !inputPolicy -> {
+                txtPolicy.setTextColor(Color.RED)
+                txtAccept.setTextColor(Color.RED)
+            }
+
+            inputUsername.isNotEmpty() && inputEmail.isNotEmpty()
+                    && inputPassword.isNotEmpty() && inputConfirmPassword.isNotEmpty()
+                    && inputPassword == inputConfirmPassword
+                    && inputPolicy -> {
                 showProgressBar(true)
                 signUp(inputUsername, inputEmail, inputPassword)
             }
-        }
-    }
 
-    // Kiểm tra Email đã tồn tại
-    private fun checkEmailExists(email: String, callback: (Boolean) -> Unit) {
-        auth.fetchSignInMethodsForEmail(email)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val signInMethods = task.result?.signInMethods
-                    val emailExists = signInMethods?.isNotEmpty() == true
-                    callback(emailExists)
-                } else {
-                    // Xử lý lỗi nếu cần thiết
-                    callback(false)
-                }
-            }
+        }
     }
 
     // Đăng ký
@@ -143,10 +145,10 @@ class SignUpActivity : AppCompatActivity() {
                         "https://firebasestorage.googleapis.com/v0/b/quanlysinhvienlan1.appspot.com/o/avatars%2FDefault%20image%20avatar.jpeg?alt=media&token=ab835105-98b2-46ba-8836-5304bc717878"
                     val defaultCoverImage =
                         "https://firebasestorage.googleapis.com/v0/b/quanlysinhvienlan1.appspot.com/o/coverImages%2FDefault%20cover%20image.png?alt=media&token=7d4b5a93-247d-485a-ab04-10951e967010"
-                    // Thêm người dùng vào FireStore
+                    // Thêm người dùng vào fireStore
                     user?.let {
                         val newUser = User(username, email, defaultImageAvatar, defaultCoverImage)
-                        firestore.collection("users")
+                        fireStore.collection("users")
                             .document(it.uid)
                             .set(newUser)
                             .addOnSuccessListener {
@@ -173,7 +175,7 @@ class SignUpActivity : AppCompatActivity() {
             is FirebaseAuthUserCollisionException -> {
                 showProgressBar(true)
                 // Địa chỉ email đã được sử dụng
-                edtEmail?.setTextColor(Color.RED)
+                edtEmail.setTextColor(Color.RED)
                 Toast.makeText(
                     this, "Địa chỉ Email đã tồn tại",
                     Toast.LENGTH_SHORT
@@ -223,35 +225,28 @@ class SignUpActivity : AppCompatActivity() {
             }
     }
 
-    // Intent đăng nhập
-    private fun intentSignIn() {
-        txtSignIn?.setOnClickListener {
-            val intent = Intent(this, SignInActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-    }
+
 
     // Trạng thái của ProgressBar
     private fun showProgressBar(show: Boolean) {
         if (show) {
-            layoutProgressBar?.visibility = View.VISIBLE
-            btnSignUp?.isEnabled = false
-            edtUsername?.isEnabled = false
-            edtEmail?.isEnabled = false
-            edtPassword?.isEnabled = false
-            edtConfirmPassword?.isEnabled = false
-            cbPolicy?.isEnabled = false
-            txtSignIn?.isEnabled = false
+            prbSignUp.visibility = View.VISIBLE
+            btnSignUp.isEnabled = false
+            edtUsername.isEnabled = false
+            edtEmail.isEnabled = false
+            edtPassword.isEnabled = false
+            edtConfirmPassword.isEnabled = false
+            cbPolicy.isEnabled = false
+            txtSignIn.isEnabled = false
         } else {
-            layoutProgressBar?.visibility = View.GONE
-            btnSignUp?.isEnabled = true
-            edtUsername?.isEnabled = true
-            edtEmail?.isEnabled = true
-            edtPassword?.isEnabled = true
-            edtConfirmPassword?.isEnabled = true
-            cbPolicy?.isEnabled = true
-            txtSignIn?.isEnabled = true
+            prbSignUp.visibility = View.GONE
+            btnSignUp.isEnabled = true
+            edtUsername.isEnabled = true
+            edtEmail.isEnabled = true
+            edtPassword.isEnabled = true
+            edtConfirmPassword.isEnabled = true
+            cbPolicy.isEnabled = true
+            txtSignIn.isEnabled = true
         }
     }
 }
