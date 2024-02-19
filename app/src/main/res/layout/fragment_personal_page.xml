@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginTop="-50dp"
-            android:visibility="gone"
+            android:indeterminateTint="@color/black"
             app:layout_constraintBottom_toBottomOf="@+id/imv_CoverImage"
             app:layout_constraintEnd_toEndOf="@+id/imv_CoverImage"
             app:layout_constraintStart_toStartOf="@+id/imv_CoverImage"
@@ -55,9 +55,9 @@
             android:id="@+id/btn_ChangeCoverImage"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:background="@drawable/custom_button_change_image"
-            android:src="@drawable/ic_camera"
+            android:src="@drawable/ic_camera_1"
             app:layout_constraintBottom_toBottomOf="@+id/imv_CoverImage"
             app:layout_constraintEnd_toEndOf="@+id/imv_CoverImage" />
 
@@ -77,7 +77,6 @@
             android:layout_height="150dp"
             android:layout_marginTop="140dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/img_default_avatar"
             app:layout_constraintEnd_toEndOf="@+id/imv_CoverImage"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="@+id/imv_CoverImage"
@@ -89,7 +88,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:visibility="gone"
+            android:indeterminateTint="@color/black"
+
             app:layout_constraintBottom_toBottomOf="@+id/img_Avatar"
             app:layout_constraintEnd_toEndOf="@+id/img_Avatar"
             app:layout_constraintStart_toStartOf="@+id/img_Avatar"
@@ -101,7 +101,7 @@
             android:layout_height="30dp"
             android:layout_margin="5dp"
             android:background="@drawable/custom_button_change_image"
-            android:src="@drawable/ic_camera"
+            android:src="@drawable/ic_camera_1"
             app:layout_constraintBottom_toBottomOf="@+id/img_Avatar"
             app:layout_constraintEnd_toEndOf="@+id/img_Avatar" />
 
