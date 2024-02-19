@@ -2,6 +2,7 @@ package com.example.quanlysinhvienlan1.fragment
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -216,6 +217,7 @@ class ProfileFragment : Fragment() {
                 )
                 useRef.update(updateName)
                     .addOnSuccessListener {
+                        txtUsername?.text = inputFullName
                         Toast.makeText(context,"Thay đổi tên thành công", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
                     }
@@ -339,6 +341,31 @@ class ProfileFragment : Fragment() {
         transaction.commit()
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.d("profileFragment", "onAttach")
+    }
+    override fun onStart() {
+        super.onStart()
+        Log.d("profileFragment", "onStart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("profileFragment", "onResume")
+    }
+    override fun onPause() {
+        super.onPause()
+        Log.d("profileFragment", "onPause")
+    }
+    override fun onStop() {
+        super.onStop()
+        Log.d("profileFragment", "onStop")
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("profileFragment", "onDestroy")
+    }
     companion object {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
