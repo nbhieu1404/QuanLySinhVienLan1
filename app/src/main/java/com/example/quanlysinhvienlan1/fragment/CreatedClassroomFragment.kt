@@ -4,7 +4,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,25 +14,21 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.quanlysinhvienlan1.MainActivity
+import com.example.quanlysinhvienlan1.OnItemClickListener
 import com.example.quanlysinhvienlan1.R
 import com.example.quanlysinhvienlan1.adapter.ClassroomAdapter
 import com.example.quanlysinhvienlan1.auth
 import com.example.quanlysinhvienlan1.data.Classroom
 import com.google.firebase.firestore.FirebaseFirestore
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [CreatedClassroomFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class CreatedClassroomFragment : Fragment() {
+class CreatedClassroomFragment : Fragment(), OnItemClickListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -41,6 +37,10 @@ class CreatedClassroomFragment : Fragment() {
     private lateinit var classroomAdapter: ClassroomAdapter
     private lateinit var btnAddNewClassroom: Button
     private lateinit var prbReloadDataCreatedClassroom: RelativeLayout
+
+    private val classList = mutableListOf<Classroom>()
+    private val classroomManagementFragment = ClassroomManagementFragment()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -58,35 +58,47 @@ class CreatedClassroomFragment : Fragment() {
         mapping(view)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        classroomAdapter = ClassroomAdapter(classList)
+        recyclerView.adapter = classroomAdapter
+
         // Sự kiện click
         clickEvent()
 
-        getClassroomList()
         return view
     }
-    private fun mapping(view : View){
+
+    private fun mapping(view: View) {
         fireStore = FirebaseFirestore.getInstance()
         recyclerView = view.findViewById(R.id.rcv_AllCreatedClass)
         btnAddNewClassroom = view.findViewById(R.id.btn_AddNewClass)
         prbReloadDataCreatedClassroom = view.findViewById(R.id.prb_ReloadDataCreatedClassroom)
 
     }
+
+    // Lấy dữ liệu lớp học
     private fun getClassroomList() {
+        // Xóa danh sách lớp
+        classList.clear()
+        val idTeacher = auth.currentUser?.uid
+        // So sánh user có phải người tạo lớp không
         fireStore.collection("classes")
-            .whereEqualTo("teacher", auth.currentUser?.uid) // Chỉ lấy các lớp học do người dùng hiện tại tạo
+            .whereEqualTo(
+                "teacher",
+                idTeacher
+            )
             .get()
             .addOnSuccessListener { documents ->
-                val classList = mutableListOf<Classroom>()
                 for (document in documents) {
                     val idClassroom = document.id
                     val nameClass = document.getString("nameClass") ?: ""
                     val membersQuantity = document.getLong("membersQuantity") ?: 0
                     val teacher = document.getString("teacher") ?: ""
-                    val classroom = Classroom(idClassroom, nameClass, teacher, membersQuantity.toInt())
+                    val classroom =
+                        Classroom(idClassroom, nameClass, teacher, membersQuantity.toInt())
                     classList.add(classroom)
                 }
-                classroomAdapter = ClassroomAdapter(classList)
-                recyclerView.adapter = classroomAdapter
+
+                // Cập nhật dữ liệu
                 classroomAdapter.notifyDataSetChanged()
                 prbReloadDataCreatedClassroom.visibility = View.GONE
             }
@@ -95,12 +107,41 @@ class CreatedClassroomFragment : Fragment() {
             }
     }
 
+
     // Xử lý các sự kiện click
     private fun clickEvent() {
         btnAddNewClassroom.setOnClickListener {
             showAddClassDialog()
         }
+        // Tạo adapter và thiết lập đối tượng lắng nghe sự kiện
+        classroomAdapter.setOnItemClickListener(object : OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                // Xử lý sự kiện khi item được click
+                val idClassroom = classList[position].idClassroom
+                Log.d("ClickedItemID", idClassroom)
+//                Toast.makeText(requireContext(), idClassroom, Toast.LENGTH_LONG).show()
+
+                // Tạo một Bundle để chứa idClassroom
+                val bundle = Bundle()
+                bundle.putString("idClassroom", idClassroom)
+
+                // Khởi tạo Fragment mới muốn chuyển đến
+                val fragment = ClassroomManagementFragment()
+                fragment.arguments = bundle
+
+                // Thực hiện thay thế Fragment hiện tại bằng Fragment mới
+                val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                transaction.replace(R.id.layout_Wrapper, fragment)
+                transaction.addToBackStack(null)
+                transaction.commit()
+
+//                val mainActivity = activity as MainActivity
+//                mainActivity.makeCurrentFragment(classroomManagementFragment)
+            }
+        })
     }
+
+    // Hiển thị/ xử lý dialog thêm lớp học
     private fun showAddClassDialog() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -142,11 +183,12 @@ class CreatedClassroomFragment : Fragment() {
                     val userCreate = auth.currentUser
                     userCreate?.let {
                         val userCreateID = userCreate.uid
+                        val mainActivity = activity as MainActivity
                         val userCreateDocRef = fireStore.collection("users").document(userCreateID)
                         userCreateDocRef.get().addOnSuccessListener { document ->
                             if (document != null && document.exists()) {
                                 val dataTeacher = userCreateID.toString()
-                                val idClassDocument = generateRandomClassCode()
+                                val idClassDocument = mainActivity.generateRandomClassCode()
                                 val classroom = Classroom(
                                     idClassroom = idClassDocument,
                                     nameClass = inputClassName,
@@ -203,15 +245,14 @@ class CreatedClassroomFragment : Fragment() {
 
         dialog.show()
     }
-    // tạo random mã cho id lớp
-    private fun generateRandomClassCode(): String {
-        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        return (1..6)
-            .map { chars.random() }
-            .joinToString("")
+
+
+    override fun onResume() {
+        super.onResume()
+        getClassroomList()
     }
+
     companion object {
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             CreatedClassroomFragment().apply {
@@ -221,4 +262,10 @@ class CreatedClassroomFragment : Fragment() {
                 }
             }
     }
+
+    override fun onItemClick(position: Int) {
+        TODO("Not yet implemented")
+    }
+
+
 }
