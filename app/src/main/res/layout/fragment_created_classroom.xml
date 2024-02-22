@@ -9,14 +9,16 @@
 
     <RelativeLayout
         android:id="@+id/prb_ReloadDataCreatedClassroom"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_progressbar"
         android:layout_gravity="center">
 
         <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_centerInParent="true"
+            android:padding="10dp"
             android:indeterminateTint="@color/black"/>
     </RelativeLayout>
 
