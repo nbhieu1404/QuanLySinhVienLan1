@@ -13,13 +13,16 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlysinhvienlan1.R
 import com.example.quanlysinhvienlan1.adapter.ClassroomAdapter
+import com.example.quanlysinhvienlan1.auth
 import com.example.quanlysinhvienlan1.data.Classroom
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
 private const val ARG_PARAM1 = "param1"
@@ -54,7 +57,8 @@ class HomeFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        getClassroomList()
+        // Lấy dữ liệu lớp học
+//        getClassroomList()
 
         // Sự kiện click
         clickEvent()
@@ -72,9 +76,11 @@ class HomeFragment : Fragment() {
 
     // Xử lý các sự kiện click
     private fun clickEvent() {
+        // Tham gia lớp học
         btnJoinClassroom.setOnClickListener {
             showAddClassDialog()
         }
+        // Reload dữ liệu lớp học
         imvIconApp.setOnClickListener {
             reloadDataHome()
         }
@@ -82,30 +88,42 @@ class HomeFragment : Fragment() {
 
     // Lấy danh sách các lớp học và cập nhật rcv bằng Adapter
     private fun getClassroomList() {
-        fireStore.collection("classes").get()
-            .addOnSuccessListener { documents ->
-                val classList = mutableListOf<Classroom>()
-                for (document in documents) {
-                    val idClassroom = document.id
-                    val nameClass = document.getString("nameClass") ?: ""
-                    val membersQuantity = document.getLong("membersQuantity") ?: 0
-                    val teacher = document.getString("teacher") ?: ""
-                    // Tạo đối tượng mới với thông tin lấy từ fireStore
-                    val classroom =
-                        Classroom(idClassroom, nameClass, teacher, membersQuantity.toInt())
-                    classList.add(classroom)
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            fireStore.collection("classes").get()
+                .addOnSuccessListener { documents ->
+                    val classList = mutableListOf<Classroom>()
+                    for (document in documents) {
+                        val idClassroom = document.id
+                        val nameClass = document.getString("nameClass") ?: ""
+                        val membersQuantity = document.getLong("membersQuantity") ?: 0
+                        val teacher = document.getString("teacher") ?: ""
+                        val members = document.get("members") as? List<String> ?: emptyList()
+
+                        // Kiểm tra xem người dùng có trong danh sách thành viên của lớp học không
+                        if (members.contains(currentUser.uid)) {
+                            // Tạo đối tượng mới với thông tin lấy từ fireStore
+                            val classroom =
+                                Classroom(idClassroom, nameClass, teacher, membersQuantity.toInt())
+                            classList.add(classroom)
+                        }
+                    }
+                    classroomAdapter = ClassroomAdapter(classList)
+                    recyclerView.adapter = classroomAdapter
+                    classroomAdapter.notifyDataSetChanged()
+                    prbReloadDataHome.visibility = View.GONE
                 }
-                classroomAdapter = ClassroomAdapter(classList)
-                recyclerView.adapter = classroomAdapter
-                classroomAdapter.notifyDataSetChanged()
-                prbReloadDataHome.visibility = View.GONE
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(requireContext(), exception.toString(), Toast.LENGTH_SHORT).show()
-            }
+                .addOnFailureListener { exception ->
+                    Toast.makeText(requireContext(), exception.toString(), Toast.LENGTH_SHORT)
+                        .show()
+                }
+        } else {
+            Toast.makeText(requireContext(), "Người dùng không tồn tại", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    // Hiển thị dialog thêm mới lớp học
+
+    // Hiển thị/ xử lý dialog thêm mới lớp học
     private fun showAddClassDialog() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -120,10 +138,90 @@ class HomeFragment : Fragment() {
         val btnJoinClassDialog = dialog.findViewById<Button>(R.id.btn_JoinClassDialog)
         val btnCancelJoinClassroomDialog = dialog.findViewById<Button>(R.id.btn_CancelJoinClass)
         val prbJoinClassroom = dialog.findViewById<RelativeLayout>(R.id.prb_JoinClassroom)
+        val txtErrorTeacher = dialog.findViewById<TextView>(R.id.txt_ErrorTeacher)
 
+        edtIDClassroom.setOnClickListener {
+            txtErrorTeacher.visibility = View.GONE
+        }
         btnJoinClassDialog.setOnClickListener {
             val inputIDClassroom = edtIDClassroom.text.toString()
-            Toast.makeText(requireContext(), inputIDClassroom, Toast.LENGTH_SHORT).show()
+
+            if (inputIDClassroom.isEmpty()) {
+                edtIDClassroom.error = "Vui lòng nhập mã lớp học"
+            } else {
+                prbJoinClassroom.visibility = View.VISIBLE
+                edtIDClassroom.isEnabled = false
+                btnJoinClassDialog.isEnabled = false
+                btnCancelJoinClassroomDialog.isEnabled = true
+
+                val currentUser = auth.currentUser
+                if (currentUser != null) {
+                    val classroomDocRef = fireStore.collection("classes").document(inputIDClassroom)
+                    classroomDocRef.get().addOnSuccessListener { document ->
+                        if (document.exists()) {
+                            val teacher = document.getString("teacher")
+                            if (teacher == currentUser.uid) {
+                                // Người dùng là giáo viên của lớp học
+                                txtErrorTeacher.text = "Bạn đã là giáo viên của lớp này!"
+                                txtErrorTeacher.visibility = View.VISIBLE
+                                edtIDClassroom.isEnabled = true
+                                btnJoinClassDialog.isEnabled = true
+                                btnCancelJoinClassroomDialog.isEnabled = true
+                                prbJoinClassroom.visibility = View.GONE
+                            } else {
+                                val members =
+                                    document.get("members") as? List<String> ?: emptyList()
+                                if (members.contains(currentUser.uid)) {
+                                    // Người dùng đã tham gia lớp học
+                                    txtErrorTeacher.text = "Bạn đã tham gia lớp học này!"
+                                    txtErrorTeacher.visibility = View.VISIBLE
+                                    edtIDClassroom.isEnabled = true
+                                    btnJoinClassDialog.isEnabled = true
+                                    btnCancelJoinClassroomDialog.isEnabled = true
+                                    prbJoinClassroom.visibility = View.GONE
+                                } else {
+                                    // Thêm người dùng hiện tại vào lớp học
+                                    classroomDocRef.update(
+                                        "members",
+                                        FieldValue.arrayUnion(currentUser.uid)
+                                    )
+                                        .addOnSuccessListener {
+                                            getClassroomList()
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Tham gia lớp học thành công",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            dialog.dismiss()
+                                        }
+                                        .addOnFailureListener { exception ->
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Tham gia lớp học thất bại: ${exception.message}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                }
+                            }
+                        } else {
+                            // Lớp học không tồn tại
+                            Toast.makeText(
+                                requireContext(),
+                                "Lớp học không tồn tại",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Người dùng không tồn tại",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+
         }
         btnCancelJoinClassroomDialog.setOnClickListener {
             dialog.dismiss()
@@ -132,10 +230,16 @@ class HomeFragment : Fragment() {
         dialog.show()
     }
 
+    // Xử lý khi tải lại dữ liệu lớp học
     private fun reloadDataHome() {
         prbReloadDataHome.visibility = View.VISIBLE
         getClassroomList()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getClassroomList()
     }
 
     companion object {
