@@ -147,9 +147,10 @@ class SignUpActivity : AppCompatActivity() {
                         "https://firebasestorage.googleapis.com/v0/b/quanlysinhvienlan1.appspot.com/o/coverImages%2FDefault%20cover%20image.png?alt=media&token=7d4b5a93-247d-485a-ab04-10951e967010"
                     // Thêm người dùng vào fireStore
                     user?.let {
-                        val newUser = User(username, email, defaultImageAvatar, defaultCoverImage)
+                        val userID = it.uid
+                        val newUser = User(userID,username, email, defaultImageAvatar, defaultCoverImage)
                         fireStore.collection("users")
-                            .document(it.uid)
+                            .document(userID)
                             .set(newUser)
                             .addOnSuccessListener {
                                 verifyEmail()
