@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:background="@drawable/custom_dialog_add_class"
+    android:paddingBottom="20dp">
+
+    <TextView
+        android:id="@+id/txt_Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:background="@drawable/custom_head_dialog_add_class"
+        android:gravity="center"
+        android:paddingVertical="12dp"
+        android:text="Xóa lớp học"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/txt_ConfirmTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="12dp"
+        android:text="Vui lòng xác nhận mật khẩu để xóa lớp học"
+        android:textColor="@color/black"
+        android:textSize="15dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_Title"/>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/box_ConfirmDeleteClassroom"
+        style="@style/MyTextInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        android:hint="Mật khẩu"
+        app:endIconMode="password_toggle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_ConfirmTitle">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edt_ConfirmDeleteClassroom"
+            style="@style/MyTextInputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_ConfirmDeleteClassroom"
+        android:layout_width="120dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/custom_button_confirm_change_password"
+        android:text="Xác nhận"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/box_ConfirmDeleteClassroom" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_CancelDeleteClassroom"
+        android:layout_width="120dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="30dp"
+        android:background="@drawable/custom_button_cancel"
+        android:text="Hủy"
+        android:textColor="#BFB3B3"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/btn_ConfirmDeleteClassroom"
+        app:layout_constraintHorizontal_bias="0.984"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/box_ConfirmDeleteClassroom" />
+
+    <RelativeLayout
+        android:id="@+id/prb_DeleteClassroom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_ConfirmDeleteClassroom"
+        app:layout_constraintEnd_toEndOf="@+id/btn_ConfirmDeleteClassroom"
+        app:layout_constraintStart_toStartOf="@+id/btn_ConfirmDeleteClassroom"
+        app:layout_constraintTop_toTopOf="@+id/btn_ConfirmDeleteClassroom">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminateTint="@color/black"/>
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
