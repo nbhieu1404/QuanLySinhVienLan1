@@ -3,6 +3,7 @@ package com.example.quanlysinhvienlan1.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.quanlysinhvienlan1.OnItemClickListener
 import com.example.quanlysinhvienlan1.R
 import com.example.quanlysinhvienlan1.data.Classroom
 import com.example.quanlysinhvienlan1.data.ClassroomViewHolder
@@ -13,6 +14,11 @@ import com.squareup.picasso.Picasso
 class ClassroomAdapter(private val classRoomList: List<Classroom>) :
     RecyclerView.Adapter<ClassroomViewHolder>() {
     private val fireStore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private var listener: OnItemClickListener? = null
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        this.listener = listener
+
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClassroomViewHolder {
         val itemView =
             LayoutInflater.from(parent.context).inflate(R.layout.item_classroom, parent, false)
@@ -28,6 +34,9 @@ class ClassroomAdapter(private val classRoomList: List<Classroom>) :
                     displayClassroomInfo(document, holder)
                 }
             }
+        holder.itemView.setOnClickListener {
+            listener?.onItemClick(position)
+        }
     }
 
     private fun displayClassroomInfo(document: DocumentSnapshot, holder: ClassroomViewHolder) {
