@@ -23,6 +23,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.example.quanlysinhvienlan1.MainActivity
 import com.example.quanlysinhvienlan1.R
 import com.example.quanlysinhvienlan1.activity.SignInActivity
 import com.example.quanlysinhvienlan1.auth
@@ -41,12 +42,14 @@ class ProfileFragment : Fragment() {
     private var layoutChangeUsername: LinearLayout? = null
     private var layoutChangePassword: LinearLayout? = null
     private var btnLogout: Button? = null
-//    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
     private val fireStore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private var isSettingsVisible = true
 
     private var param1: String? = null
     private var param2: String? = null
+
+    private val personalPageFragment = PersonalPageFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +64,8 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
-        // Ánh xạ
-        mapping(view)
+        // Ánh xạ các views
+        mappingViews(view)
         // Lấy dữ liệu người dùng
         getUserData()
         // CLick sự kiện
@@ -71,7 +74,7 @@ class ProfileFragment : Fragment() {
     }
 
     //Ánh xạ
-    private fun mapping(view: View) {
+    private fun mappingViews(view: View) {
         layoutUser = view.findViewById(R.id.layout_User)
         txtUsername = view.findViewById(R.id.txt_Username)
         layoutAccountSettings = view.findViewById(R.id.layout_AccountSettings)
@@ -109,7 +112,9 @@ class ProfileFragment : Fragment() {
     private fun clickEvent() {
         // chuyển sang trang nội dung người dùng
         layoutUser?.setOnClickListener {
-            navigateToPersonalPageFragment()
+//            navigateToPersonalPageFragment()
+            val mainActivity = activity as? MainActivity
+            mainActivity?.makeCurrentFragment(personalPageFragment)
         }
         // Hiển thị/ ẩn settings
         layoutAccountSettings?.setOnClickListener {
@@ -190,7 +195,7 @@ class ProfileFragment : Fragment() {
         )
         window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        var prbChangeUsername = dialog.findViewById<RelativeLayout>(R.id.prb_ChangeUsername)
+        val prbChangeUsername = dialog.findViewById<RelativeLayout>(R.id.prb_ChangeUsername)
         val edtNewFirstName = dialog.findViewById<EditText>(R.id.edt_NewFirstName)
         val edtNewLastName = dialog.findViewById<EditText>(R.id.edt_NewLastName)
         val btnConfirmChangeUsername = dialog.findViewById<Button>(R.id.btn_ConfirmChangeUsername)
@@ -341,31 +346,7 @@ class ProfileFragment : Fragment() {
         transaction.commit()
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Log.d("profileFragment", "onAttach")
-    }
-    override fun onStart() {
-        super.onStart()
-        Log.d("profileFragment", "onStart")
-    }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d("profileFragment", "onResume")
-    }
-    override fun onPause() {
-        super.onPause()
-        Log.d("profileFragment", "onPause")
-    }
-    override fun onStop() {
-        super.onStop()
-        Log.d("profileFragment", "onStop")
-    }
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("profileFragment", "onDestroy")
-    }
     companion object {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
