@@ -34,15 +34,20 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        mapping()
+        // Ánh xạ các Views
+        mappingViews()
+        // Kết nối các fragment
         setUpBottomNavigation()
     }
 
-    private fun mapping() {
+    // Ánh xạ Views
+    private fun mappingViews() {
         btmNav = findViewById(R.id.btm_nav)
+        // Luôn khởi tạo fragment home đầu tiên
         makeCurrentFragment(homeFragment)
     }
 
+    // Thay đổi fragments khi chọn icon bNav
     private fun setUpBottomNavigation() {
         btmNav.setOnItemSelectedListener {
             when (it.itemId) {
@@ -54,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Nếu ở home mà ấn back thì hỏi -> xác nhận thoát
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (currentFragment == homeFragment) {
@@ -64,10 +70,13 @@ class MainActivity : AppCompatActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
-    private fun makeCurrentFragment(fragment: Fragment) {
+    // Thay đổi fragments
+    fun makeCurrentFragment(fragment: Fragment) {
         currentFragment = fragment
         supportFragmentManager.beginTransaction().apply {
             replace(R.id.layout_Wrapper, fragment)
+
+            // Xếp các frm vào ngăn xếp
             if (currentFragment != homeFragment) {
                 addToBackStack(backStackTag)
             }
@@ -75,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Hiển thị dialog thoát ứng dụng
     private fun showExitDialog() {
         MaterialAlertDialogBuilder(this)
             .setTitle("Thoát ứng dụng")
@@ -84,18 +94,21 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    // Kiểm tra phiên bản Android
     fun checkNeedsPermission(): Boolean {
         val permission =
             if (ATLEAST_TIRAMISU) Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE
         return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
     }
 
+    // Yêu cầu cấp quyền đọc hình ảnh
     fun requestNeedsPermission() {
         val permission =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.READ_MEDIA_IMAGES else Manifest.permission.READ_EXTERNAL_STORAGE
         requestPermissions(arrayOf(permission), REQUEST_CODE)
     }
 
+    // Không cho phép cấp quyền -> vào cài đặt cấp quyên
     fun goToSettings(context: Context) {
         AlertDialog.Builder(context)
             .setTitle("Chưa cấp quyền truy cập bộ nhớ")
@@ -111,6 +124,7 @@ class MainActivity : AppCompatActivity() {
             .create().show()
     }
 
+    // Xử lý code cấp quyền truy cập hình ảnh
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -126,4 +140,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Khởi tạo random id
+    fun generateRandomClassCode(): String {
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return (1..6)
+            .map { chars.random() }
+            .joinToString("")
+    }
 }
