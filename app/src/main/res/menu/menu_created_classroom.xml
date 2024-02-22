@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/updateInformationClassroom"
+        android:icon="@drawable/ic_pencil"
+        android:title="Chỉnh sửa lớp học">
+
+    </item>
+    <item
+        android:id="@+id/listMembersJoinedClassroom"
+        android:icon="@drawable/ic_members"
+        android:title="Danh sách thành viên">
+
+    </item>
+    <item
+        android:id="@+id/deleteClassroom"
+        android:icon="@drawable/ic_members"
+        android:title="Xóa lớp học">
+
+    </item>
+</menu>
