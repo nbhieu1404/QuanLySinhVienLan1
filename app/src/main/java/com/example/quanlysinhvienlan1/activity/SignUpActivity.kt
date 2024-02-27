@@ -44,7 +44,7 @@ class SignUpActivity : AppCompatActivity() {
         // Ánh xạ
         mappingViews()
         // Bấm sự kiện
-        clickEvent()
+        clickEvents()
 
     }
 
@@ -62,7 +62,7 @@ class SignUpActivity : AppCompatActivity() {
         prbSignUp = findViewById(R.id.layout_ProgressBar)
     }
 
-    private fun clickEvent() {
+    private fun clickEvents() {
         edtEmail.setOnClickListener {
             resetErrorBoxEmail()
         }
@@ -108,10 +108,10 @@ class SignUpActivity : AppCompatActivity() {
         val inputPolicy = cbPolicy.isChecked
 
         when {
-            inputUsername.isNullOrEmpty() -> edtUsername.error = "Vui lòng nhập tên người dùng"
-            inputEmail.isNullOrEmpty() -> edtEmail.error = "Vui lòng nhập email"
-            inputPassword.isNullOrEmpty() -> edtPassword.error = "Vui lòng nhập mật khẩu"
-            inputConfirmPassword.isNullOrEmpty() -> edtConfirmPassword.error =
+            inputUsername.isEmpty() -> edtUsername.error = "Vui lòng nhập tên người dùng"
+            inputEmail.isEmpty() -> edtEmail.error = "Vui lòng nhập email"
+            inputPassword.isEmpty() -> edtPassword.error = "Vui lòng nhập mật khẩu"
+            inputConfirmPassword.isEmpty() -> edtConfirmPassword.error =
                 "Vui lòng nhập lại mật khẩu"
 
             inputPassword != inputConfirmPassword -> edtConfirmPassword.error =
@@ -225,7 +225,6 @@ class SignUpActivity : AppCompatActivity() {
                 showProgressBar(false)
             }
     }
-
 
 
     // Trạng thái của ProgressBar
