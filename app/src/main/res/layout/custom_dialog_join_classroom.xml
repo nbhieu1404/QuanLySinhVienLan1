@@ -48,7 +48,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginStart="20dp"
             android:textStyle="italic"
-            android:text="Bạn đã là giáo viên của lớp này!"
+            android:text=" "
             android:visibility="gone"
             android:textColor="@color/red"/>
         <LinearLayout
