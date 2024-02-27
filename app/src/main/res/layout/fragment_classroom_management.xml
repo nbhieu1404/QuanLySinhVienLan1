@@ -7,6 +7,20 @@
     android:background="@color/gray"
     tools:context=".fragment.ClassroomManagementFragment">
 
+    <RelativeLayout
+        android:id="@+id/prb_ReloadDataClassroomManagement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/custom_progressbar">
+
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
+            android:indeterminateTint="@color/black"
+            android:padding="10dp" />
+    </RelativeLayout>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -39,7 +53,7 @@
                 android:layout_gravity="center_vertical"
                 android:paddingVertical="10dp"
                 android:paddingStart="10dp"
-                android:text="Ten lop hoc"
+                android:text=""
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -63,7 +77,7 @@
                 android:layout_weight="1"
                 android:paddingHorizontal="5dp"
                 android:paddingVertical="10dp"
-                android:text="Số lượng"
+                android:text=""
                 android:textColor="@color/white"
                 android:textSize="20sp" />
 
@@ -77,7 +91,7 @@
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcv_AllQuiz"
+            android:id="@+id/rcv_AllQuizSet"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginBottom="5dp"
