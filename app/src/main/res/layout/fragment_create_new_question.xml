@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#461A42"
+    tools:context=".fragment.ListMembersFragment">
+
+    <!--    <RelativeLayout-->
+    <!--        android:id="@+id/prb_ReloadDataListMembers"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_gravity="center"-->
+    <!--        android:background="@drawable/custom_progressbar">-->
+
+    <!--        <ProgressBar-->
+    <!--            android:layout_width="50dp"-->
+    <!--            android:layout_height="50dp"-->
+    <!--            android:layout_centerInParent="true"-->
+    <!--            android:indeterminateTint="@color/black"-->
+    <!--            android:padding="10dp"/>-->
+    <!--    </RelativeLayout>-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layout_ListMemberActionBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/statusBar"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/btn_CreateNewQuestionBackClassroomManagement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_white_back" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingVertical="10dp"
+                android:paddingStart="10dp"
+                android:text="Tạo câu hỏi"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_ListMemberActionBar">
+
+            <LinearLayout
+                android:id="@+id/rcv_ListMembers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/edt_InputQuestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:background="@drawable/custom_input_question"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:hint="Nhập câu hỏi vào đây"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/gray"
+                    android:textSize="16sp" />
+
+                <RadioGroup
+                    android:id="@+id/rdg_radioGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/custom_layout_answer_1" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/custom_layout_answer_12"
+                        android:orientation="vertical">
+
+                        <EditText
+                            android:id="@+id/edt_inputAnswer1"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginHorizontal="10dp"
+                            android:layout_marginVertical="5dp"
+                            android:background="@drawable/custom_input_answer_1"
+                            android:gravity="center"
+                            android:hint="Nhập tùy chọn câu trả lời ở đây"
+                            android:textColor="@color/white"
+                            android:textColorHint="@color/gray"
+                            android:textSize="15sp" />
+                    </LinearLayout>
+
+                    <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/custom_layout_answer_2" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/custom_layout_answer_22"
+                        android:orientation="vertical">
+
+                        <EditText
+                            android:id="@+id/edt_inputAnswer2"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginHorizontal="10dp"
+                            android:layout_marginVertical="5dp"
+                            android:background="@drawable/custom_input_answer_2"
+                            android:gravity="center"
+                            android:hint="Nhập tùy chọn câu trả lời ở đây"
+                            android:textColor="@color/white"
+                            android:textColorHint="@color/gray"
+                            android:textSize="15sp" />
+                    </LinearLayout>
+
+                    <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/custom_layout_answer_3" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/custom_layout_answer_32"
+                        android:orientation="vertical">
+
+                        <EditText
+                            android:id="@+id/edt_inputAnswer3"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginHorizontal="10dp"
+                            android:layout_marginVertical="5dp"
+                            android:background="@drawable/custom_input_answer_3"
+                            android:gravity="center"
+                            android:hint="Nhập tùy chọn câu trả lời ở đây"
+                            android:textColor="@color/white"
+                            android:textColorHint="@color/gray"
+                            android:textSize="15sp" />
+                    </LinearLayout>
+
+                    <RadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/custom_layout_answer_4" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/custom_layout_answer_42"
+                        android:orientation="vertical">
+
+                        <EditText
+                            android:id="@+id/edt_inputAnswer4"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginHorizontal="10dp"
+                            android:layout_marginVertical="5dp"
+                            android:background="@drawable/custom_input_answer_4"
+                            android:gravity="center"
+                            android:hint="Nhập tùy chọn câu trả lời ở đây"
+                            android:textColor="@color/white"
+                            android:textColorHint="@color/gray"
+                            android:textSize="15sp" />
+                    </LinearLayout>
+
+                </RadioGroup>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_SaveQuestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="30dp"
+                    android:background="@drawable/custom_button_add_new_quiz"
+                    android:drawableStart="@drawable/ic_save"
+                    android:paddingHorizontal="100dp"
+                    android:text="Lưu câu hỏi"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>
