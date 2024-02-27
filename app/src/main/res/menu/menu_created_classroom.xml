@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/shareCodeClassroom"
+        android:icon="@drawable/ic_pencil"
+        android:title="Chia sẻ">
+
+    </item>
+
+    <item
         android:id="@+id/updateInformationClassroom"
         android:icon="@drawable/ic_pencil"
         android:title="Chỉnh sửa lớp học">
