@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.quanlysinhvienlan1.OnItemClickListener
 import com.example.quanlysinhvienlan1.R
 import com.example.quanlysinhvienlan1.data.Classroom
-import com.example.quanlysinhvienlan1.data.ClassroomViewHolder
+import com.example.quanlysinhvienlan1.viewholder.ClassroomViewHolder
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
