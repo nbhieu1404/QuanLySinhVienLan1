@@ -54,6 +54,8 @@ class CreatedClassroomFragment : Fragment(), OnItemClickListener {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_created_classroom, container, false)
+        fireStore = FirebaseFirestore.getInstance()
+
         // Ánh xạ các view
         mapping(view)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -68,7 +70,7 @@ class CreatedClassroomFragment : Fragment(), OnItemClickListener {
     }
 
     private fun mapping(view: View) {
-        fireStore = FirebaseFirestore.getInstance()
+
         recyclerView = view.findViewById(R.id.rcv_AllCreatedClass)
         btnAddNewClassroom = view.findViewById(R.id.btn_AddNewClass)
         prbReloadDataCreatedClassroom = view.findViewById(R.id.prb_ReloadDataCreatedClassroom)
@@ -80,6 +82,7 @@ class CreatedClassroomFragment : Fragment(), OnItemClickListener {
         // Xóa danh sách lớp
         classList.clear()
         val idTeacher = auth.currentUser?.uid
+
         // So sánh user có phải người tạo lớp không
         fireStore.collection("classes")
             .whereEqualTo(
