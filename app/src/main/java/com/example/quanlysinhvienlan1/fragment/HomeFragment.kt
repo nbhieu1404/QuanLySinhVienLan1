@@ -140,6 +140,9 @@ class HomeFragment : Fragment() {
         val prbJoinClassroom = dialog.findViewById<RelativeLayout>(R.id.prb_JoinClassroom)
         val txtErrorTeacher = dialog.findViewById<TextView>(R.id.txt_ErrorTeacher)
 
+        var quantityMembers: Int = 0
+        var membersInClassroom: Int = 0
+
         edtIDClassroom.setOnClickListener {
             txtErrorTeacher.visibility = View.GONE
         }
@@ -158,9 +161,25 @@ class HomeFragment : Fragment() {
                 if (currentUser != null) {
                     val classroomDocRef = fireStore.collection("classes").document(inputIDClassroom)
                     classroomDocRef.get().addOnSuccessListener { document ->
+
+                        val memberQuantity = document.getLong("membersQuantity")
+                        // Lấy danh sách ép sang kiểu string
+                        val membersString = document.get("members").toString()
+                        // Tách chuỗi
+                        val membersList = membersString.split(",")
+                        // Số lượng học viên cho phép
+                        quantityMembers = memberQuantity?.toInt() ?: 0
+                        // Lấy kích cỡ
+                        membersInClassroom = membersList.size
+
                         if (document.exists()) {
                             val teacher = document.getString("teacher")
                             if (teacher == currentUser.uid) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    membersString,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 // Người dùng là giáo viên của lớp học
                                 txtErrorTeacher.text = "Bạn đã là giáo viên của lớp này!"
                                 txtErrorTeacher.visibility = View.VISIBLE
@@ -168,7 +187,17 @@ class HomeFragment : Fragment() {
                                 btnJoinClassDialog.isEnabled = true
                                 btnCancelJoinClassroomDialog.isEnabled = true
                                 prbJoinClassroom.visibility = View.GONE
-                            } else {
+                            }
+                            else if (document.exists() && membersInClassroom == quantityMembers) {
+                                // Thông báo đã full chỗ
+                                txtErrorTeacher.text = "Lớp học đã đầy!"
+                                txtErrorTeacher.visibility = View.VISIBLE
+                                edtIDClassroom.isEnabled = true
+                                btnJoinClassDialog.isEnabled = true
+                                btnCancelJoinClassroomDialog.isEnabled = true
+                                prbJoinClassroom.visibility = View.GONE
+                            }
+                            else {
                                 val members =
                                     document.get("members") as? List<String> ?: emptyList()
                                 if (members.contains(currentUser.uid)) {
@@ -210,6 +239,10 @@ class HomeFragment : Fragment() {
                                 "Lớp học không tồn tại",
                                 Toast.LENGTH_SHORT
                             ).show()
+                            edtIDClassroom.isEnabled = true
+                            btnJoinClassDialog.isEnabled = true
+                            btnCancelJoinClassroomDialog.isEnabled = true
+                            prbJoinClassroom.visibility = View.GONE
                         }
                     }
                 } else {
