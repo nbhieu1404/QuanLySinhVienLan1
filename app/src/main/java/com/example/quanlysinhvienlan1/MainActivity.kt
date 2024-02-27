@@ -143,8 +143,28 @@ class MainActivity : AppCompatActivity() {
     // Khởi tạo random id
     fun generateRandomClassCode(): String {
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        return (1..6)
+        val prefix = "CLASS"
+        val randomPart = (1..6)
             .map { chars.random() }
             .joinToString("")
+        return "$prefix$randomPart"
+    }
+
+    fun generateQuestionSetCode(): String {
+        val chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+        val prefix = "QTS"
+        val randomPart = (1..6)
+            .map { chars.random() }
+            .joinToString("")
+        return "$prefix$randomPart"
+    }
+
+    fun generateQuestionsCode(): String {
+        val chars = "abcdefghijklmnopqrstuvwxyz0123456789"
+        val prefix = "QT"
+        val randomPart = (1..6)
+            .map { chars.random() }
+            .joinToString("")
+        return "$prefix$randomPart"
     }
 }
