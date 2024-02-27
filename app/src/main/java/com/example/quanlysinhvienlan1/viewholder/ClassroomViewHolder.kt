@@ -1,4 +1,4 @@
-package com.example.quanlysinhvienlan1.data
+package com.example.quanlysinhvienlan1.viewholder
 
 import android.view.View
 import android.widget.ImageView
