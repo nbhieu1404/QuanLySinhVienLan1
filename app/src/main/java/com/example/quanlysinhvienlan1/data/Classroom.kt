@@ -5,5 +5,5 @@ class Classroom(
     var nameClass: String = "",
     var teacher: String = "",
     var membersQuantity: Int = 0,
-    var members: List<User> = emptyList()
+    var members: List<String> = emptyList()
 )

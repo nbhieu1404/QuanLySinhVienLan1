@@ -14,6 +14,12 @@
 
     </item>
     <item
+        android:id="@+id/Attendance"
+        android:icon="@drawable/ic_members"
+        android:title="Điểm danh">
+
+    </item>
+    <item
         android:id="@+id/listMembersJoinedClassroom"
         android:icon="@drawable/ic_members"
         android:title="Danh sách thành viên">

@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="20dp"
     android:layout_marginBottom="10dp"
-    android:background="@drawable/custom_background_item_profile"
+    android:background="@drawable/custom_background_question"
     android:orientation="vertical">
 
     <LinearLayout
@@ -27,6 +27,7 @@
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_UpdateQuestion"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center_vertical"
@@ -37,6 +38,7 @@
             android:paddingHorizontal="8dp" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_DeleteQuestion"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center_vertical"

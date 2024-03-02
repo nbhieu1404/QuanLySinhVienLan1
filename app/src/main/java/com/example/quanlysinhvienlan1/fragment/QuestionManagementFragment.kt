@@ -7,15 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.quanlysinhvienlan1.OnItemClickListener
 import com.example.quanlysinhvienlan1.R
 import com.example.quanlysinhvienlan1.adapter.QuestionAdapter
 import com.example.quanlysinhvienlan1.data.Question
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore
 
 // TODO: Rename parameter arguments, choose names that match
@@ -40,6 +44,8 @@ class QuestionManagementFragment : Fragment(), DialogInterface.OnClickListener {
     private val questionList = mutableListOf<Question>()
     private lateinit var prbReloadQuestionManagementB: RelativeLayout
     private lateinit var txtQuestionQuantity: TextView
+    private lateinit var boxSearchQuestion: EditText
+    private lateinit var btnSearchQuestion: Button
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +62,7 @@ class QuestionManagementFragment : Fragment(), DialogInterface.OnClickListener {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_question_management, container, false)
         fireStore = FirebaseFirestore.getInstance()
+
         val setId = arguments?.getString("idQuestionSet")
         val idQuestionSet = setId.toString()
         if (setId != null) {
@@ -78,6 +85,8 @@ class QuestionManagementFragment : Fragment(), DialogInterface.OnClickListener {
             view.findViewById(R.id.btn_QuestionManagementBackClassroomManagement)
         prbReloadQuestionManagementB = view.findViewById(R.id.prb_ReloadQuestionManagementB)
         txtQuestionQuantity = view.findViewById(R.id.txt_QuestionQuantity)
+        boxSearchQuestion = view.findViewById(R.id.box_SearchQuestion)
+        btnSearchQuestion = view.findViewById(R.id.btn_SearchQuestion)
     }
 
     private fun getData(idQuestionSet: String) {
@@ -106,27 +115,153 @@ class QuestionManagementFragment : Fragment(), DialogInterface.OnClickListener {
                 questionAdapter.notifyDataSetChanged()
                 prbReloadQuestionManagementB.visibility = View.GONE
             }
-            .addOnFailureListener{
+            .addOnFailureListener {
                 Log.e("dataQuestion", it.toString())
             }
     }
 
     private fun clickEvents(idQuestionSet: String) {
         btnCreateNewQuestion.setOnClickListener {
-            val bundle = Bundle()
-            bundle.putString("QuestionSetID", idQuestionSet)
-            val fragment = CreateNewQuestion()
-            fragment.arguments = bundle
+            fireStore.collection("QuestionSet").document(idQuestionSet).get()
+                .addOnSuccessListener {
+                    val status = it.getLong("status")?.toInt()
+                    if (status == 1) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Bộ câu hỏi này đang được diễn ra!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        val bundle = Bundle()
+                        bundle.putString("QuestionSetID", idQuestionSet)
+                        val fragment = CreateNewQuestion()
+                        fragment.arguments = bundle
 
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.layout_Wrapper, fragment)
-            transaction.addToBackStack(null)
-            transaction.commit()
+                        val transaction =
+                            requireActivity().supportFragmentManager.beginTransaction()
+                        transaction.replace(R.id.layout_Wrapper, fragment)
+                        transaction.addToBackStack(null)
+                        transaction.commit()
+                    }
+
+                }
         }
         btnQuestionManagementBackClassroomManagement.setOnClickListener {
             backToProfileFragment()
         }
+        questionAdapter.setOnItemClickListener(object : OnItemClickListener {
+            override fun onItemClick(position: Int) {
 
+            }
+
+            override fun onUpdateButtonClick(position: Int) {
+                val questionId = questionList[position].questionID
+                val questionSetId = questionList[position].questionSetID
+                fireStore.collection("QuestionSet").document(questionSetId).get()
+                    .addOnSuccessListener {
+                        val status = it.getLong("status")?.toInt()
+                        if (status == 1) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Bộ câu hỏi này đang được diễn ra!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            val fragment = UpdateQuestionFragment()
+                            val bundle = Bundle()
+                            bundle.putString(
+                                "SendUpdateQuestionID",
+                                questionId
+                            )
+                            fragment.arguments = bundle
+                            val transaction =
+                                requireActivity().supportFragmentManager.beginTransaction()
+                            transaction.replace(R.id.layout_Wrapper, fragment)
+                            transaction.addToBackStack(null)
+                            transaction.commit()
+                        }
+
+                    }
+            }
+
+            override fun onDeleteButtonClick(position: Int) {
+                val questionId = questionList[position].questionID
+                val questionSetId = questionList[position].questionSetID
+                fireStore.collection("QuestionSet").document(questionSetId).get()
+                    .addOnSuccessListener {
+                        val status = it.getLong("status")?.toInt()
+                        if (status == 1) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Bộ câu hỏi này đang được diễn ra!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle("Xóa câu hỏi")
+                                .setMessage("Bạn có chắc chắn muốn xóa câu hỏi?")
+                                .setPositiveButton("Có") { _, _ ->
+                                    fireStore.collection("Questions").document(questionId)
+                                        .delete()
+                                        .addOnSuccessListener {
+                                            fireStore.collection("QuestionSet")
+                                                .document(questionSetId).get()
+                                                .addOnSuccessListener { documentSnapshot ->
+                                                    if (documentSnapshot.exists()) {
+                                                        val questions =
+                                                            documentSnapshot.get("questions") as? List<String>
+                                                                ?: emptyList()
+                                                        // Loại bỏ giá trị questionId khỏi mảng questions
+                                                        val updatedQuestions =
+                                                            questions.filter { it != questionId }
+                                                        // Cập nhật lại mảng questions vào tài liệu
+                                                        fireStore.collection("QuestionSet")
+                                                            .document(questionSetId)
+                                                            .update(
+                                                                "questions",
+                                                                updatedQuestions
+                                                            )
+                                                            .addOnSuccessListener {
+                                                                prbReloadQuestionManagementB.visibility =
+                                                                    View.VISIBLE
+                                                                getData(idQuestionSet)
+                                                                Toast.makeText(
+                                                                    requireContext(),
+                                                                    "Xóa câu hỏi thành công",
+                                                                    Toast.LENGTH_SHORT
+                                                                ).show()
+                                                            }
+                                                    }
+                                                }
+                                        }
+                                }
+                                .setNegativeButton("Không") { _, _ -> }
+                                .show()
+                        }
+                    }
+
+            }
+
+            override fun onStartQuestionSetClick(position: Int) {
+
+            }
+
+            override fun onStopQuestionSetClick(position: Int) {
+
+            }
+
+        })
+        btnSearchQuestion.setOnClickListener {
+            val keyword = boxSearchQuestion.text.toString()
+            searchQuestions(keyword)
+        }
+    }
+
+    private fun searchQuestions(keyword: String) {
+        val filteredList = questionList.filter { it.questionName.contains(keyword, true) }
+        questionAdapter.setData(filteredList)
+        val stringQuestionQuantity = filteredList.size.toString() + " câu"
+        txtQuestionQuantity.text = stringQuestionQuantity
     }
 
     private fun backToProfileFragment() {
@@ -149,4 +284,6 @@ class QuestionManagementFragment : Fragment(), DialogInterface.OnClickListener {
     override fun onClick(dialog: DialogInterface?, which: Int) {
         TODO("Not yet implemented")
     }
+
+
 }

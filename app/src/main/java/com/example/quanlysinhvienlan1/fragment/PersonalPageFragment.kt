@@ -46,6 +46,8 @@ class PersonalPageFragment : Fragment() {
     private lateinit var fireStore: FirebaseFirestore
     private lateinit var firebaseStorage: FirebaseStorage
 
+    private lateinit var txtCreatedQuantityClassroom: TextView
+
     // Lắng nghe kết quả chọn hình ảnh avatar
     private val pickImageAvatarLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -106,6 +108,7 @@ class PersonalPageFragment : Fragment() {
         btnChangeAvatar = view.findViewById(R.id.btn_ChangeAvatar)
         prbAvatar = view.findViewById(R.id.layout_AvatarProgressBar)
         prbCoverImage = view.findViewById(R.id.layout_CoverImageProgressBar)
+        txtCreatedQuantityClassroom = view.findViewById(R.id.txt_CreatedQuantityClassroom)
 
     }
 
@@ -122,15 +125,23 @@ class PersonalPageFragment : Fragment() {
                         val fireStoreAvatar = documentSnapshot.getString("avatar")
                         val fireStoreCoverImage = documentSnapshot.getString("coverImage")
 
-                        txtUsername.text = fireStoreUsername
-                        txtEmailDetails.text = fireStoreEmail
-                        txtUsernameDetails.text = fireStoreUsername
+
 
                         fireStoreAvatar?.let {
                             Picasso.get().load(it).into(imgAvatar)
                         }
                         fireStoreCoverImage?.let {
                             Picasso.get().load(it).into(imvCoverImage)
+                        }
+                        txtUsername.text = fireStoreUsername
+                        txtEmailDetails.text = fireStoreEmail
+                        txtUsernameDetails.text = fireStoreUsername
+                        fireStore.collection("classes").whereEqualTo("teacher", userID).get().addOnSuccessListener {
+                            if (it.documents.isEmpty()) {
+                                txtCreatedQuantityClassroom.text = "Số lượng lớp học: Chưa có lớp nào"
+                            } else {
+                                txtCreatedQuantityClassroom.text = "Số lượng lớp học: " + it.documents.size.toString() + " lớp "
+                            }
                         }
                         prbAvatar.visibility = View.GONE
                         prbCoverImage.visibility = View.GONE

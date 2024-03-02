@@ -31,6 +31,7 @@ import com.example.quanlysinhvienlan1.adapter.QuestionSetAdapter
 import com.example.quanlysinhvienlan1.auth
 import com.example.quanlysinhvienlan1.data.Question
 import com.example.quanlysinhvienlan1.data.QuestionSet
+import com.example.quanlysinhvienlan1.data.Score
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
@@ -52,8 +53,8 @@ class ClassroomManagementFragment : Fragment(), DialogInterface.OnClickListener 
     private lateinit var rcvAllQuestionSet: RecyclerView
     private lateinit var questionSetAdapter: QuestionSetAdapter
     private val questionSetList = mutableListOf<QuestionSet>()
-
     private lateinit var prbReloadDataClassroomManagement: RelativeLayout
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,27 +119,40 @@ class ClassroomManagementFragment : Fragment(), DialogInterface.OnClickListener 
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val nameClass = document.getString("nameClass")
-                    val memberQuantity = document.getLong("membersQuantity")
-
+                    val memberQuantity = document.getLong("membersQuantity").toString()
+                    val dataMembersList = document.get("members") as List<String>
+                    val data = dataMembersList.size
+                    val quantityMembers = "$data/$memberQuantity học viên"
                     // Gán thông tin lớp học cho các TextView
                     txtNameClassroomManagement.text = nameClass
-                    txtMemberQuantityManagementActionBar.text = memberQuantity?.toString() ?: ""
-                    fireStore.collection("QuestionSet").whereEqualTo("classroomID", classroomId)
-                        .get().addOnSuccessListener { querySnapshot ->
+                    txtMemberQuantityManagementActionBar.text = quantityMembers
 
-//                            questionSetList.clear()
+
+                    fireStore.collection("QuestionSet")
+                        .whereEqualTo("classroomID", document.get("idClassroom"))
+                        .get().addOnSuccessListener { querySnapshot ->
                             for (documents in querySnapshot) {
                                 val questionSetID = documents.getString("setId") ?: ""
                                 val idClassroom = classroomId
                                 val nameQuestionSet = documents.getString("setName") ?: ""
                                 val questions =
-                                    documents.get("questions") as List<Question> ?: emptyList()
+                                    documents.get("questions") as List<Question>
+                                val status = documents.getLong("status")
+                                var finalStatus: Int = 0
+                                if (status != null) {
+                                    finalStatus = status.toInt()
+                                }
+                                Log.d(
+                                    "statusInt",
+                                    "$questionSetID/$idClassroom/$nameQuestionSet/$status/$questions"
+                                )
 
                                 val questionSet = QuestionSet(
                                     questionSetID,
                                     idClassroom,
                                     nameQuestionSet,
-                                    questions
+                                    questions,
+                                    finalStatus
                                 )
                                 questionSetList.add(questionSet)
                             }
@@ -176,6 +190,169 @@ class ClassroomManagementFragment : Fragment(), DialogInterface.OnClickListener 
                 transaction.commit()
             }
 
+            override fun onUpdateButtonClick(position: Int) {
+
+            }
+
+            override fun onDeleteButtonClick(position: Int) {
+
+            }
+
+            override fun onStartQuestionSetClick(position: Int) {
+                val selectedQuestionSet = questionSetList[position] // Lấy ra bộ câu hỏi được chọn
+
+                val questionSetRef = fireStore.collection("QuestionSet")
+
+                var check: Int = 0
+                // Kiểm tra nếu có bộ câu hỏi nào có trạng thái là 1
+                questionSetRef.whereEqualTo("classroomID", selectedQuestionSet.classroomID).get()
+                    .addOnSuccessListener { querySnapshot ->
+                        for (documents in querySnapshot) {
+                            val getStatus = documents.getLong("status")
+                            if (getStatus != null) {
+                                check = getStatus.toInt()
+                                Log.d("selectedQuestionSet", "${check}")
+                            }
+                            if (check == 1) {
+                                break
+                            }
+                        }
+                        if (check == 1) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Có bài tập đang được diễn ra",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else if (check == 0) {
+                            var temp: Int = 0
+                            questionSetRef.document(selectedQuestionSet.setId).get()
+                                .addOnSuccessListener {
+                                    val quantityQuestion = it.get("questions") as List<String>
+                                    temp = quantityQuestion.size
+                                    if (temp == 0) {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "Không có bài tập nào",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else if (temp >= 1) {
+                                        val dialog = Dialog(requireContext())
+                                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                                        dialog.setContentView(R.layout.custom_dialog_set_time_countdown)
+                                        val window = dialog.window ?: return@addOnSuccessListener
+                                        window.setLayout(
+                                            WindowManager.LayoutParams.MATCH_PARENT,
+                                            WindowManager.LayoutParams.WRAP_CONTENT
+                                        )
+                                        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                                        val edtSetCountdownTime =
+                                            dialog.findViewById<TextView>(R.id.edt_SetCountdownTime)
+                                        val btnConfirmSetTimeCountdown =
+                                            dialog.findViewById<Button>(R.id.btn_ConfirmSetTimeCountdown)
+                                        val btnCancelSetCountdownTime =
+                                            dialog.findViewById<Button>(R.id.btn_CancelSetCountdownTime)
+                                        val txtErrorCountdownTime =
+                                            dialog.findViewById<TextView>(R.id.txt_ErrorCountdownTime)
+                                        edtSetCountdownTime.setOnClickListener {
+                                            txtErrorCountdownTime.visibility = View.GONE
+                                        }
+                                        btnConfirmSetTimeCountdown.setOnClickListener {
+                                            val inputCountDownTime =
+                                                edtSetCountdownTime.text.toString().trim()
+                                            when {
+                                                inputCountDownTime.toInt() < 5 -> {
+                                                    txtErrorCountdownTime.text =
+                                                        "Thời gian làm bài phải nhiều hơn 5 phút!"
+                                                    txtErrorCountdownTime.visibility = View.VISIBLE
+                                                }
+
+                                                inputCountDownTime.toInt() > 60 -> {
+                                                    txtErrorCountdownTime.text =
+                                                        "Thời gian làm bài tối da là 60 phút!"
+                                                    txtErrorCountdownTime.visibility = View.VISIBLE
+                                                }
+
+                                                else -> {
+                                                    val update = hashMapOf<String, Any>(
+                                                        "status" to 1,
+                                                        "countDownTime" to inputCountDownTime.toInt()
+                                                    )
+                                                    // Nếu không, cập nhật trạng thái của bộ câu hỏi được chọn sang 1
+                                                    questionSetRef.document(selectedQuestionSet.setId)
+                                                        .update(update)
+                                                        .addOnSuccessListener {
+                                                            registerAttendance(idClassroom)
+                                                            dialog.dismiss()
+                                                            getData(idClassroom)
+                                                        }
+                                                        .addOnFailureListener { exception ->
+                                                            // Xảy ra lỗi khi cập nhật
+                                                            Toast.makeText(
+                                                                requireContext(),
+                                                                "Lỗi: ${exception.message}",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+                                                }
+                                            }
+                                        }
+
+                                        btnCancelSetCountdownTime.setOnClickListener {
+                                            dialog.dismiss()
+                                        }
+                                        dialog.show()
+
+                                    }
+                                }
+                        }
+                    }
+                    .addOnFailureListener { exception ->
+                        // Xảy ra lỗi khi truy vấn
+                        Toast.makeText(
+                            requireContext(),
+                            "Lỗi: ${exception.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+            }
+
+            override fun onStopQuestionSetClick(position: Int) {
+                Log.d("StartStop", "onStopQuestionSetClick")
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Xác nhận kết thúc")
+                    .setMessage("Bạn có chắc chắn muốn muốn kết thúc tắt làm bài?")
+                    .setPositiveButton("Kết thúc") { _, _ ->
+                        val selectedQuestionSet = questionSetList[position]
+                        val update = hashMapOf<String, Any>(
+                            "status" to 0,
+                            "countDownTime" to 0
+                        )
+                        fireStore.collection("QuestionSet").document(selectedQuestionSet.setId)
+                            .update(update)
+                            .addOnSuccessListener {
+                                fireStore.collection("Attendance").document(idClassroom).get()
+                                    .addOnSuccessListener {
+                                        val getUserScore = it.get("getScoreToDay") as? List<Score>
+                                        if (getUserScore != null) {
+                                            Log.d("getUserScore", getUserScore.toString())
+                                        } else {
+                                            Log.d("getUserScore", null.toString())
+                                        }
+
+                                    }
+//                                // Cập nhật thành công
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Đã kết thúc bài tập!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                getData(idClassroom)
+                            }
+                    }
+                    .setNegativeButton("Hủy") { _, _ -> }
+                    .show()
+            }
+
         })
     }
 
@@ -194,6 +371,18 @@ class ClassroomManagementFragment : Fragment(), DialogInterface.OnClickListener 
                 // Bấm cập nhật lớp học
                 R.id.updateInformationClassroom -> {
                     showDialogUpdateClassroom(idClassroom)
+                    true
+                }
+
+                R.id.Attendance -> {
+                    val bundle = Bundle()
+                    bundle.putString("getIdClassroom", idClassroom)
+                    val fragment = AttendanceFragment()
+                    fragment.arguments = bundle
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.layout_Wrapper, fragment)
+                    transaction.addToBackStack(null)
+                    transaction.commit()
                     true
                 }
 
@@ -494,7 +683,7 @@ class ClassroomManagementFragment : Fragment(), DialogInterface.OnClickListener 
 
 //                    Toast.makeText(requireContext(), setID, Toast.LENGTH_SHORT).show()
                     val newQuestionSet =
-                        QuestionSet(setID, classroomId, setNameQuestionSet, questionList)
+                        QuestionSet(setID, classroomId, setNameQuestionSet, questionList, 0)
 
                     fireStore.collection("QuestionSet").document(setID).set(newQuestionSet)
                         .addOnSuccessListener {
@@ -522,6 +711,80 @@ class ClassroomManagementFragment : Fragment(), DialogInterface.OnClickListener 
             dialog.dismiss()
         }
         dialog.show()
+    }
+
+    private fun registerAttendance(idClassroom: String) {
+        val mainActivity = activity as MainActivity
+        val today = mainActivity.generateDays()
+        fireStore.collection("Attendance")
+            .whereEqualTo("idClassroom", idClassroom)
+            .whereEqualTo("date", today).get()
+            .addOnSuccessListener {
+                if (it.isEmpty) {
+                    val userScore = mutableListOf<Score>()
+
+                    fireStore.collection("classes")
+                        .document(idClassroom)
+                        .get()
+                        .addOnSuccessListener { documentSnapshot ->
+                            if (documentSnapshot.exists()) {
+                                val members =
+                                    documentSnapshot.get(
+                                        "members"
+                                    ) as? List<String>
+                                if (members != null) {
+                                    for (member in members) {
+                                        val getMember = Score(
+                                            memberID = member,
+                                            getScoreToDay = 0.0
+                                        )
+                                        userScore.add(getMember)
+                                    }
+                                    val update =
+                                        hashMapOf<String, Any>(
+                                            "classroomId" to idClassroom,
+                                            "date" to today,
+                                            "getScoreToDay" to userScore
+                                        )
+                                    val dcm = "$idClassroom${mainActivity.generateDays()}"
+                                    fireStore.collection("Attendance")
+                                        .document(dcm)
+                                        .set(update)
+                                        .addOnSuccessListener {
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Bộ câu hỏi đã được triển khai!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                        .addOnFailureListener { exception ->
+                                            Log.e(
+                                                "registerAttendance",
+                                                "Error: ${exception.message}"
+                                            )
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Đã xảy ra lỗi khi triển khai!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                } else {
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "Không có thành viên nào!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Bộ câu hỏi đã được triển khai!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
     }
 
 

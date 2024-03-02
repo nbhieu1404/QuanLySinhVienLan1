@@ -1,9 +1,14 @@
 package com.example.quanlysinhvienlan1.fragment
 
+import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,10 +23,15 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.quanlysinhvienlan1.MainActivity
+import com.example.quanlysinhvienlan1.OnItemClickListener
+import com.example.quanlysinhvienlan1.OnItemLongClickListener
 import com.example.quanlysinhvienlan1.R
+import com.example.quanlysinhvienlan1.activity.DoQuestionActivity
 import com.example.quanlysinhvienlan1.adapter.ClassroomAdapter
 import com.example.quanlysinhvienlan1.auth
 import com.example.quanlysinhvienlan1.data.Classroom
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -37,6 +47,8 @@ class HomeFragment : Fragment() {
     private lateinit var classroomAdapter: ClassroomAdapter
     private lateinit var imvIconApp: ImageView
     private lateinit var prbReloadDataHome: RelativeLayout
+    private lateinit var boxSearchHome: EditText
+    private val classList = mutableListOf<Classroom>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,16 +64,19 @@ class HomeFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         fireStore = FirebaseFirestore.getInstance()
+//        classList.clear()
+        getClassroomList()
         // Ánh xạ các view
         mapping(view)
 
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // Lấy dữ liệu lớp học
-//        getClassroomList()
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        classroomAdapter = ClassroomAdapter(classList)
+        recyclerView.adapter = classroomAdapter
 
         // Sự kiện click
         clickEvent()
+//        setupSearchEvent()
         return view
     }
 
@@ -71,7 +86,7 @@ class HomeFragment : Fragment() {
         btnJoinClassroom = view.findViewById(R.id.btn_JoinClassroom)
         imvIconApp = view.findViewById(R.id.imv_IconApp)
         prbReloadDataHome = view.findViewById(R.id.prb_ReloadDataHome)
-
+        boxSearchHome = view.findViewById(R.id.box_searchHome)
     }
 
     // Xử lý các sự kiện click
@@ -84,32 +99,114 @@ class HomeFragment : Fragment() {
         imvIconApp.setOnClickListener {
             reloadDataHome()
         }
+        classroomAdapter.setOnItemClickListener(object : OnItemClickListener {
+            override fun onItemClick(position: Int) {
+                val questionID = classList[position].idClassroom
+                fireStore.collection("QuestionSet").whereEqualTo("classroomID", questionID)
+                    .whereEqualTo("status", 1).get().addOnSuccessListener { query ->
+                        if (!query.isEmpty) {
+                            var idQuestionSet: String = ""
+                            for (document in query) {
+                                idQuestionSet = document.id
+//                                getData(idQuestionSet)
+                                Log.d("queryS", idQuestionSet.toString())
+                            }
+                            showDialogConfirmStartQuestion(idQuestionSet)
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Bộ câu hỏi này chưa được bắt đầu!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            getClassroomList()
+
+                        }
+                    }
+            }
+
+            override fun onUpdateButtonClick(position: Int) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onDeleteButtonClick(position: Int) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onStartQuestionSetClick(position: Int) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onStopQuestionSetClick(position: Int) {
+                TODO("Not yet implemented")
+            }
+
+        })
+
+        classroomAdapter.setOnItemLongClickListener(object : OnItemLongClickListener {
+            override fun onItemLongClick(position: Int) {
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Rời khỏi lớp")
+                    .setMessage("Bạn có chắc chắn muốn rời khỏi lớp học?")
+                    .setPositiveButton("Có") { _, _ ->
+                        leaveClassroom(position)
+                    }
+                    .setNegativeButton("Không") { _, _ -> }
+                    .show()
+            }
+
+        })
     }
+
+    private fun showDialogConfirmStartQuestion(idQuestionSet: String) {
+        val dialog = AlertDialog.Builder(requireContext())
+        dialog.setTitle("Bắt đầu làm bài")
+        dialog.setMessage("Bạn có chắc chắn muốn bắt đầu làm bài?")
+        dialog.setPositiveButton("Tham gia") { _, _ ->
+            val bundle = Bundle()
+            bundle.putString("QuestionSetID", idQuestionSet)
+            val intent = Intent(requireActivity(), DoQuestionActivity::class.java)
+            intent.putExtras(bundle)
+            requireActivity().startActivity(intent)
+            val main = activity as MainActivity
+            main.finish()
+        }
+        dialog.setNegativeButton("Hủy") { _, _ -> }
+        dialog.show()
+
+    }
+
 
     // Lấy danh sách các lớp học và cập nhật rcv bằng Adapter
     private fun getClassroomList() {
+        // Xóa toàn bộ dữ liệu cũ trước khi thêm dữ liệu mới
+        classList.clear()
         val currentUser = auth.currentUser
         if (currentUser != null) {
             fireStore.collection("classes").get()
                 .addOnSuccessListener { documents ->
-                    val classList = mutableListOf<Classroom>()
                     for (document in documents) {
-                        val idClassroom = document.id
-                        val nameClass = document.getString("nameClass") ?: ""
-                        val membersQuantity = document.getLong("membersQuantity") ?: 0
-                        val teacher = document.getString("teacher") ?: ""
-                        val members = document.get("members") as? List<String> ?: emptyList()
-
-                        // Kiểm tra xem người dùng có trong danh sách thành viên của lớp học không
-                        if (members.contains(currentUser.uid)) {
-                            // Tạo đối tượng mới với thông tin lấy từ fireStore
-                            val classroom =
-                                Classroom(idClassroom, nameClass, teacher, membersQuantity.toInt())
-                            classList.add(classroom)
+                        // Tạo đối tượng Classroom từ dữ liệu Firestore
+                        val members = document.get("members") as? List<String>
+                        if (members != null) {
+                            for (member in members) {
+                                if (member == currentUser.uid) {
+                                    val idClassroom = document.id
+                                    val nameClass = document.getString("nameClass") ?: ""
+                                    val membersQuantity = document.getLong("membersQuantity") ?: 0
+                                    val teacher = document.getString("teacher") ?: ""
+                                    val classroom = Classroom(
+                                        idClassroom = idClassroom,
+                                        nameClass = nameClass,
+                                        teacher = teacher,
+                                        membersQuantity = membersQuantity.toInt(),
+                                        members = members
+                                    )
+                                    classList.add(classroom)
+                                }
+                            }
                         }
                     }
-                    classroomAdapter = ClassroomAdapter(classList)
-                    recyclerView.adapter = classroomAdapter
+                    // Cập nhật RecyclerView sau khi đã lấy được dữ liệu mới từ Firestore
                     classroomAdapter.notifyDataSetChanged()
                     prbReloadDataHome.visibility = View.GONE
                 }
@@ -159,7 +256,8 @@ class HomeFragment : Fragment() {
 
                 val currentUser = auth.currentUser
                 if (currentUser != null) {
-                    val classroomDocRef = fireStore.collection("classes").document(inputIDClassroom)
+                    val classroomDocRef =
+                        fireStore.collection("classes").document(inputIDClassroom)
                     classroomDocRef.get().addOnSuccessListener { document ->
 
                         val memberQuantity = document.getLong("membersQuantity")
@@ -187,8 +285,7 @@ class HomeFragment : Fragment() {
                                 btnJoinClassDialog.isEnabled = true
                                 btnCancelJoinClassroomDialog.isEnabled = true
                                 prbJoinClassroom.visibility = View.GONE
-                            }
-                            else if (document.exists() && membersInClassroom == quantityMembers) {
+                            } else if (document.exists() && membersInClassroom == quantityMembers) {
                                 // Thông báo đã full chỗ
                                 txtErrorTeacher.text = "Lớp học đã đầy!"
                                 txtErrorTeacher.visibility = View.VISIBLE
@@ -196,8 +293,7 @@ class HomeFragment : Fragment() {
                                 btnJoinClassDialog.isEnabled = true
                                 btnCancelJoinClassroomDialog.isEnabled = true
                                 prbJoinClassroom.visibility = View.GONE
-                            }
-                            else {
+                            } else {
                                 val members =
                                     document.get("members") as? List<String> ?: emptyList()
                                 if (members.contains(currentUser.uid)) {
@@ -267,13 +363,105 @@ class HomeFragment : Fragment() {
     private fun reloadDataHome() {
         prbReloadDataHome.visibility = View.VISIBLE
         getClassroomList()
+    }
 
+    private fun leaveClassroom(position: Int) {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val classroomId = classList[position].idClassroom
+            val classroomDocRef = fireStore.collection("classes").document(classroomId)
+
+            classroomDocRef.get().addOnSuccessListener { documentSnapshot ->
+                val members = documentSnapshot.get("members") as? List<String> ?: emptyList()
+
+                if (members.contains(currentUser.uid)) {
+                    val updatedMembers = members.filter { it != currentUser.uid }
+
+                    classroomDocRef.update("members", updatedMembers)
+                        .addOnSuccessListener {
+                            getClassroomList()
+                            Toast.makeText(
+                                requireContext(),
+                                "Đã rời khỏi lớp học",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        .addOnFailureListener { exception ->
+                            Toast.makeText(
+                                requireContext(),
+                                "Lỗi: ${exception.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Bạn không thuộc lớp học này",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+                .addOnFailureListener { exception ->
+                    Toast.makeText(
+                        requireContext(),
+                        "Lỗi: ${exception.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+        } else {
+            Toast.makeText(requireContext(), "Người dùng không tồn tại", Toast.LENGTH_SHORT).show()
+        }
+
+
+    }
+
+    // Xử lý sự kiện tìm kiếm
+    private fun setupSearchEvent() {
+        boxSearchHome.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+                // Không cần xử lý trước khi text thay đổi
+            }
+
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+                // Không cần xử lý khi text thay đổi
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                val searchText = s.toString().trim()
+                // Tìm kiếm khi ngừng nhập
+                if (searchText.isEmpty()) {
+                    // Nếu ô tìm kiếm trống, hiển thị lại toàn bộ danh sách lớp học
+                    getClassroomList()
+                } else {
+                    // Nếu có văn bản trong ô tìm kiếm, thực hiện tìm kiếm và cập nhật adapter
+                    val filteredList = classroomAdapter.filter(searchText)
+                    classroomAdapter.setData(filteredList)
+                }
+            }
+        })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        classList.clear()
     }
 
     override fun onResume() {
         super.onResume()
-        getClassroomList()
+        classList.clear()
+//        getClassroomList()
     }
+
 
     companion object {
         @JvmStatic
@@ -285,4 +473,5 @@ class HomeFragment : Fragment() {
                 }
             }
     }
+
 }

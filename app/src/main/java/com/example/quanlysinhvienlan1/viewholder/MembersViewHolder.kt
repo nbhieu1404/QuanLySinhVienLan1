@@ -10,4 +10,5 @@ class MembersViewHolder (itemView: View): RecyclerView.ViewHolder(itemView){
     val imgAvatarMember: ImageView = itemView.findViewById(R.id.view_avatarMember)
     val txtNameMember: TextView = itemView.findViewById(R.id.txt_NameMember)
     val txtEmailMember: TextView = itemView.findViewById(R.id.txt_EmailMember)
+    val btnDeleteMember: ImageView = itemView.findViewById(R.id.btn_DeleteMember)
 }

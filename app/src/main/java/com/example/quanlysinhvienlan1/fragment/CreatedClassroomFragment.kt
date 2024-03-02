@@ -23,6 +23,7 @@ import com.example.quanlysinhvienlan1.R
 import com.example.quanlysinhvienlan1.adapter.ClassroomAdapter
 import com.example.quanlysinhvienlan1.auth
 import com.example.quanlysinhvienlan1.data.Classroom
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.firestore.FirebaseFirestore
 
 private const val ARG_PARAM1 = "param1"
@@ -96,8 +97,9 @@ class CreatedClassroomFragment : Fragment(), OnItemClickListener {
                     val nameClass = document.getString("nameClass") ?: ""
                     val membersQuantity = document.getLong("membersQuantity") ?: 0
                     val teacher = document.getString("teacher") ?: ""
+                    val members = document.get("members") as List<String>
                     val classroom =
-                        Classroom(idClassroom, nameClass, teacher, membersQuantity.toInt())
+                        Classroom(idClassroom, nameClass, teacher, membersQuantity.toInt(), members)
                     classList.add(classroom)
                 }
 
@@ -140,6 +142,22 @@ class CreatedClassroomFragment : Fragment(), OnItemClickListener {
 
 //                val mainActivity = activity as MainActivity
 //                mainActivity.makeCurrentFragment(classroomManagementFragment)
+            }
+
+            override fun onUpdateButtonClick(position: Int) {
+
+            }
+
+            override fun onDeleteButtonClick(position: Int) {
+
+            }
+
+            override fun onStartQuestionSetClick(position: Int) {
+
+            }
+
+            override fun onStopQuestionSetClick(position: Int) {
+
             }
         })
     }
@@ -267,6 +285,22 @@ class CreatedClassroomFragment : Fragment(), OnItemClickListener {
     }
 
     override fun onItemClick(position: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onUpdateButtonClick(position: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onDeleteButtonClick(position: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onStartQuestionSetClick(position: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onStopQuestionSetClick(position: Int) {
         TODO("Not yet implemented")
     }
 

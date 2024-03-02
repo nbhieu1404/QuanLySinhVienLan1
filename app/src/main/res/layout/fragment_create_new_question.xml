@@ -92,6 +92,7 @@
                     android:orientation="vertical">
 
                     <RadioButton
+                        android:id="@+id/rdb_A1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@drawable/custom_layout_answer_1" />
@@ -118,6 +119,7 @@
                     </LinearLayout>
 
                     <RadioButton
+                        android:id="@+id/rdb_A2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
@@ -145,6 +147,7 @@
                     </LinearLayout>
 
                     <RadioButton
+                        android:id="@+id/rdb_A3"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
@@ -172,6 +175,7 @@
                     </LinearLayout>
 
                     <RadioButton
+                        android:id="@+id/rdb_A4"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"

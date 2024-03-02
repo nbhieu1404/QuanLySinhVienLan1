@@ -11,4 +11,5 @@ class ClassroomViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView) {
     val txtClassName: TextView = itemView.findViewById(R.id.txt_NameClassroom)
     val txtNameTeacherClass: TextView = itemView.findViewById(R.id.txt_NameTeacherClass)
     val txtMembersQuantity: TextView = itemView.findViewById(R.id.txt_MembersQuantity)
+    val txtStatusQuestion: TextView = itemView.findViewById(R.id.txt_StatusQuestion)
 }

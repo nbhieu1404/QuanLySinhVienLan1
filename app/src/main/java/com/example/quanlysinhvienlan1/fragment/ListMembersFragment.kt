@@ -1,7 +1,7 @@
 package com.example.quanlysinhvienlan1.fragment
 
+import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.quanlysinhvienlan1.OnItemClickListener
 import com.example.quanlysinhvienlan1.R
 import com.example.quanlysinhvienlan1.adapter.MembersAdapter
 import com.example.quanlysinhvienlan1.data.User
@@ -64,7 +65,7 @@ class ListMembersFragment : Fragment() {
         rcvListMembers.adapter = membersAdapter
 
 
-        clickEvent()
+        clickEvent(idClass)
         return view
     }
 
@@ -74,10 +75,57 @@ class ListMembersFragment : Fragment() {
         prbReloadDataListMembers = view.findViewById(R.id.prb_ReloadDataListMembers)
     }
 
-    private fun clickEvent() {
+    private fun clickEvent(idClassroom: String) {
         btnBackClassroomManagement.setOnClickListener {
             backToCreatedClassroomManagement()
         }
+        membersAdapter.setOnItemClickListener(object : OnItemClickListener {
+            override fun onItemClick(position: Int) {
+
+            }
+
+            override fun onUpdateButtonClick(position: Int) {
+
+            }
+
+            override fun onDeleteButtonClick(position: Int) {
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setTitle("Xóa thành viên")
+                builder.setMessage("Bạn có chắc chắn muốn xóa thành viên này?")
+                builder.setPositiveButton("Có") { _, _ ->
+                    val idMember = membersList[position].userID
+                    fireStore.collection("classes").document(idClassroom).get()
+                        .addOnSuccessListener {
+                            if (it.exists()) {
+                                val members = it.get("members") as List<String>
+                                if (members.contains(idMember)) {
+                                    val updatedMember = members.filter { it != idMember }
+                                    fireStore.collection("classes").document(idClassroom)
+                                        .update("members", updatedMember).addOnSuccessListener {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "Đã xóa thành viên",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        getDataMembers(idClassroom)
+                                    }
+                                }
+                            }
+                        }
+                }
+                builder.setNegativeButton("Không") { _, _ -> }
+                builder.show()
+            }
+
+            override fun onStartQuestionSetClick(position: Int) {
+
+            }
+
+            override fun onStopQuestionSetClick(position: Int) {
+
+            }
+
+        })
     }
 
     private fun backToCreatedClassroomManagement() {

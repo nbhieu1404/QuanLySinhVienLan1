@@ -19,6 +19,7 @@ import com.example.quanlysinhvienlan1.fragment.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
+import java.util.Calendar
 
 val ATLEAST_TIRAMISU = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 val REQUEST_CODE = 999
@@ -166,5 +167,14 @@ class MainActivity : AppCompatActivity() {
             .map { chars.random() }
             .joinToString("")
         return "$prefix$randomPart"
+    }
+    fun generateDays(): String {
+        val currentTime = Calendar.getInstance()
+
+        val currentDay = currentTime.get(Calendar.DAY_OF_MONTH)
+        val currentMonth = currentTime.get(Calendar.MONTH) + 1
+        val currentYear = currentTime.get(Calendar.YEAR)
+
+        return "$currentDay-$currentMonth-$currentYear"
     }
 }

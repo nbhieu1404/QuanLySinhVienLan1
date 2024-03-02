@@ -1,64 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:background="@drawable/custom_background_item_profile"
+    android:layout_marginHorizontal="10dp"
     android:layout_marginTop="10dp"
-    android:layout_marginHorizontal="20dp">
+    android:background="@drawable/custom_background_item_profile"
+    android:orientation="horizontal">
+
     <com.makeramen.roundedimageview.RoundedImageView
-        android:id="@+id/view_avatarTeacher"
-        android:layout_gravity="center_vertical"
+        android:id="@+id/view_avatarMemberAttendance"
         android:layout_width="40dp"
         android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
         android:layout_marginStart="20dp"
         android:scaleType="centerCrop"
         android:src="@drawable/img_default_avatar"
         app:riv_corner_radius="150dp" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:orientation="vertical"
-        android:paddingVertical="2dp"
-        android:layout_gravity="center_vertical">
+        android:paddingVertical="2dp">
+
         <TextView
-            android:id="@+id/txt_NameClassroom"
+            android:id="@+id/txt_NameMember"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="..."
+            android:layout_marginStart="20dp"
+            android:text="Họ tên: "
             android:textColor="@color/black"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginStart="20dp"/>
+            android:textStyle="bold" />
+
         <TextView
-            android:id="@+id/txt_NameTeacherClass"
+            android:id="@+id/txt_Email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=""
+            android:layout_marginStart="20dp"
+            android:text="Email: "
             android:textColor="@color/black"
-            android:textSize="12sp"
-            android:textStyle="italic"
-            android:layout_marginStart="20dp"/>
-        <TextView
-            android:id="@+id/txt_StatusQuestion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/black"
-            android:textSize="12sp"
-            android:textStyle="italic"
-            android:layout_marginStart="20dp"/>
+            android:textSize="13sp"
+            android:textStyle="italic" />
     </LinearLayout>
 
     <TextView
-        android:id="@+id/txt_MembersQuantity"
+        android:id="@+id/txt_Score"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=""
-        android:textColor="@color/gray"
-        android:textSize="15sp"
         android:layout_gravity="center_vertical"
         android:gravity="end"
-        android:paddingEnd="20dp"/>
+        android:paddingEnd="10dp"
+        android:text="Điểm: "
+        android:textColor="@color/red"
+        android:textSize="16sp" />
 </LinearLayout>
